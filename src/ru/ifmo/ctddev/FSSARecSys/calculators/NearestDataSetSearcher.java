@@ -1,7 +1,7 @@
 package ru.ifmo.ctddev.FSSARecSys.calculators;
 
-import javafx.util.Pair;
 import ru.ifmo.ctddev.FSSARecSys.db.DataSet;
+import ru.ifmo.ctddev.FSSARecSys.utils.Pair;
 
 public class NearestDataSetSearcher {
     /**

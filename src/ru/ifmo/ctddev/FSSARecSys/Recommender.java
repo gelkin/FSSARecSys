@@ -1,12 +1,12 @@
 package ru.ifmo.ctddev.FSSARecSys;
 
-import javafx.util.Pair;
 import ru.ifmo.ctddev.FSSARecSys.calculators.EARRComputer;
 import ru.ifmo.ctddev.FSSARecSys.calculators.FSSAlgorithmRanker;
 import ru.ifmo.ctddev.FSSARecSys.calculators.NearestDataSetSearcher;
 import ru.ifmo.ctddev.FSSARecSys.db.Classifier;
 import ru.ifmo.ctddev.FSSARecSys.db.DataSet;
 import ru.ifmo.ctddev.FSSARecSys.db.FSSAlgorithm;
+import ru.ifmo.ctddev.FSSARecSys.utils.Pair;
 
 import java.io.File;
 import java.util.Collection;
