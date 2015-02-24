@@ -1,9 +1,9 @@
 package ru.ifmo.ctddev.FSSARecSys;
 
-import javafx.util.Pair;
 import ru.ifmo.ctddev.FSSARecSys.calculators.Evaluator;
 import ru.ifmo.ctddev.FSSARecSys.calculators.FSSAlgorithm;
 import ru.ifmo.ctddev.FSSARecSys.db.DataSet;
+import ru.ifmo.ctddev.FSSARecSys.utils.Pair;
 
 import java.util.Collection;
 
