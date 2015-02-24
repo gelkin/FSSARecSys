@@ -1,79 +1,39 @@
 package ru.ifmo.ctddev.FSSARecSys.db;
 
 import ru.ifmo.ctddev.FSSARecSys.EvaluationResult;
+import ru.ifmo.ctddev.FSSARecSys.FSSResult;
+import ru.ifmo.ctddev.FSSARecSys.calculators.Evaluator;
+import ru.ifmo.ctddev.FSSARecSys.calculators.FSSAlgorithm;
 import weka.core.Instances;
 
-import java.io.File;
-
-
-public class DataSet extends ORM {
-    public DataSet(String name, File pathToARRFFile) {
-        this(name, pathToARRFFile, 0);
-    }
-
-    public DataSet(String name, File pathToARRFFile, int classIndex) {
-
-    }
-
-    public String getName() {return null;}
-
-    public int getClassIndex() {  // or it's useless because it's always 0?
-        return 0;
-    }
+public interface DataSet {
+    public String getName();
 
     /**
-     * This should be implemented lazy way with caching!
+     * if it has class index it should be already applied
      */
-    public Instances getDataSet() {
-        return null;
-    }
+    public Instances getDataSet();
 
-
-    // think about return type for this 2 methods:
-    // Do MFs always doubles?
+    public String[] getAvailableMeatFeatureNames();
+    public double getMetaFeature(String name);
+    public double[] getMetaFeatures(String[] names);
+    public void updateMetaFeature(String name, double value);
+    public void updateMetaFeatures(String[] names, double[] values);
 
     /**
-     * load it value from DB
+     * extract and save using results:
+     * selection time
+     * count of selected features
+     * selected features in order
      */
-    public double getMetaFeature(String name) {
-        return 0;
-    }
+    public void selectFeatures(FSSAlgorithm algorithm);
+    public FSSResult getFSSResult(FSSAlgorithm algorithm);
+    public void updateSelectionResult(FSSAlgorithm algorithm, FSSResult result);
 
     /**
-     * load their values from DB
+     * evaluate(classify or cluster) selected by algorithm features and store result
      */
-    public double[] getMetaFeatures(String[] names) {
-        return null;
-    }
-
-    /**
-     * save it value to DB
-     */
-    public void setMetaFeature(String name, double value) {
-    }
-
-    /**
-     * save their values to DB
-     */
-    public void setMetaFeatures(String[] names, double[] values) {
-    }
-
-    public EvaluationResult getEvaluationResult(Classifier classifier, FSSAlgorithm algorithm) {
-        return null;
-    }
-
-    public double[] extractMetaFeatures(String[] metaFeaturesNames) {
-        // Should we save result here?
-        // Where gets generated metaFeaturesNames?
-        // How it gets transformed to MetaFeatureExtractor?
-        return null;
-    }
-
-    public void updateFeaturesExtractionResult(FSSAlgorithm algorithm, float featureSelectionTime, int numberOfSelectedFeatures, int[] selectedFeatures) {
-
-    }
-
-    public void updateFeaturesClassificationResult(FSSAlgorithm algorithm, Classifier classifier, float accuracy, float F1Measure) {
-
-    }
+    public void evaluate(FSSAlgorithm algorithm, Evaluator evaluator);
+    public EvaluationResult getEvaluationResult(Evaluator evaluator, FSSAlgorithm algorithm);
+    public void updateEvaluationResult(Evaluator evaluator, FSSAlgorithm algorithm, EvaluationResult result);
 }
