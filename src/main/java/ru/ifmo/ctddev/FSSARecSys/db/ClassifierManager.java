@@ -3,9 +3,10 @@ package ru.ifmo.ctddev.FSSARecSys.db;
 import ru.ifmo.ctddev.FSSARecSys.calculators.ClassifierEvaluator;
 
 import java.io.File;
+import java.util.List;
 
 public interface ClassifierManager {
-    public String[] getAvailableClassifierNames();
+    public List<String> getAvailableClassifierNames();
 
     public ClassifierEvaluator get(String name);
 
