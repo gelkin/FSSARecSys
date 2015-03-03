@@ -1,8 +1,8 @@
 package ru.ifmo.ctddev.FSSARecSys.calculators;
 
 import ru.ifmo.ctddev.FSSARecSys.ClassifierResult;
-import ru.ifmo.ctddev.FSSARecSys.db.DataSet;
+import weka.core.Instances;
 
 public interface ClassifierEvaluator {
-    public ClassifierResult evaluate(DataSet dataSet);
+    public ClassifierResult evaluate(Instances train, Instances test);
 }
