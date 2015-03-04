@@ -22,8 +22,15 @@ public interface FSSAlgorithmManager {
         return algorithms;
     }
 
-    public boolean register(String name, String algorithmClassName, String evaluationClassName);
+    public default boolean register(String name, String algorithmClassName, String evaluationClassName) {
+        return register(name, algorithmClassName, null, evaluationClassName, null);
+    }
+
     public boolean register(String name, String algorithmClassName, String[] algorithmOptions, String evaluationClassName, String[] evaluationOptions);
-    public boolean register(String name, String algorithmClassName, String evaluationClassName, File jarFile);
+
+    public default boolean register(String name, String algorithmClassName, String evaluationClassName, File jarFile) {
+        return register(name, algorithmClassName, null, evaluationClassName, null, jarFile);
+    }
+
     public boolean register(String name, String algorithmClassName, String[] algorithmOptions, String evaluationClassName, String[] evaluationOptions, File jarFile);
 }
