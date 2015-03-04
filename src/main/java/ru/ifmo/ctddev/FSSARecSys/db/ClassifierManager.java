@@ -13,7 +13,9 @@ public interface ClassifierManager {
     /**
      * @see #register(String, String, String[], java.io.File)
      */
-    public boolean register(String name, String className);
+    public default boolean register(String name, String className) {
+        return register(name, className, (String[]) null);
+    }
 
     /**
      * @param name classifier's name
@@ -28,7 +30,9 @@ public interface ClassifierManager {
     /**
      * @see #register(String, String, String[], java.io.File)
      */
-    public boolean register(String name, String className, File jarFile);
+    public default boolean register(String name, String className, File jarFile) {
+        return register(name, className, null, jarFile);
+    }
 
     /**
      * @param name classifier's name
