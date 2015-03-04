@@ -1,9 +1,14 @@
 package ru.ifmo.ctddev.FSSARecSys;
 
-
 import java.util.List;
+import java.util.Objects;
 
 public class ClassifierResult {
+
+    public String dataSetName;
+
+    public String classifierName;
+
     /**
      * Accuracy computed on given DataSet with given Classifier
      */
@@ -14,12 +19,17 @@ public class ClassifierResult {
      */
     public double f1Measure;
 
-    public ClassifierResult(double accuracy, double f1Measure) {
+    public ClassifierResult(String dataSetName, String classifierName, double accuracy, double f1Measure) {
+        this.dataSetName = Objects.requireNonNull(dataSetName);
+        this.classifierName = Objects.requireNonNull(classifierName);
         this.accuracy = accuracy;
         this.f1Measure = f1Measure;
     }
 
     public static ClassifierResult averageClassifierResult(List<ClassifierResult> results) {
+        if (results == null || results.size() == 0) {
+            throw new IllegalArgumentException("results list must be non empty");
+        }
         double averageAccuracy = 0;
         double averageF1Measure = 0;
         for (ClassifierResult result : results) {
@@ -28,6 +38,8 @@ public class ClassifierResult {
         }
         averageAccuracy /= results.size();
         averageF1Measure /= results.size();
-        return new ClassifierResult(averageAccuracy, averageF1Measure);
+        String dataSetName = results.get(0).dataSetName;
+        String classifierName = results.get(0).classifierName;
+        return new ClassifierResult(dataSetName, classifierName, averageAccuracy, averageF1Measure);
     }
 }

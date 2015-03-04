@@ -2,6 +2,7 @@ package ru.ifmo.ctddev.FSSARecSys.calculators.internal;
 
 import ru.ifmo.ctddev.FSSARecSys.ClassifierResult;
 import ru.ifmo.ctddev.FSSARecSys.calculators.ClassifierEvaluator;
+import ru.ifmo.ctddev.FSSARecSys.utils.Pair;
 import weka.classifiers.Classifier;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -26,7 +27,7 @@ public class ClassifierEvaluatorImpl implements ClassifierEvaluator {
     }
 
     @Override
-    public ClassifierResult evaluate(Instances train, Instances test) {
+    public ClassifierResult evaluate(String dataSetName, Instances train, Instances test) {
         int[][] confusionMatrix = new int[train.numClasses()][train.numClasses()];
 
         try {
@@ -39,15 +40,20 @@ public class ClassifierEvaluatorImpl implements ClassifierEvaluator {
                     confusionMatrix[classIndex][instance.classIndex()]++;
                 }
             }
-            return computeClassifierResult(confusionMatrix);
+            Pair<Double, Double> result = computeAccuracyAndF1Measure(confusionMatrix);
+            return new ClassifierResult(dataSetName, name, result.first, result.second);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return new ClassifierResult(0, 0);
+        return new ClassifierResult(dataSetName, name, 0, 0);
     }
 
-    public static ClassifierResult computeClassifierResult(int[][] confusionMatrix) {
+    /**
+     * @param confusionMatrix result confusion matrix after classifier evaluation
+     * @return pair of accuracy and f1 measure
+     */
+    public static Pair<Double, Double> computeAccuracyAndF1Measure(int[][] confusionMatrix) {
         if (confusionMatrix == null) {
             throw new IllegalArgumentException("confusionMatrix must be not null");
         }
@@ -92,7 +98,7 @@ public class ClassifierEvaluatorImpl implements ClassifierEvaluator {
         if (sumAll != 0) {
             accuracy = correct / (double) sumAll;
         }
-        return new ClassifierResult(accuracy, computeF1Measure(precision, recall));
+        return Pair.of(accuracy, computeF1Measure(precision, recall));
 
     }
 
