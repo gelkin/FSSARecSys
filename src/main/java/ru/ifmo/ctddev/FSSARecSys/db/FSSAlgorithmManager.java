@@ -22,15 +22,48 @@ public interface FSSAlgorithmManager {
         return algorithms;
     }
 
-    public default boolean register(String name, String algorithmClassName, String evaluationClassName) {
-        return register(name, algorithmClassName, null, evaluationClassName, null);
+    /**
+     * @see #register(String, String, String[], String, String[])
+     */
+    public default boolean register(String name, String searchClassName, String evaluationClassName) {
+        return register(name, searchClassName, null, evaluationClassName, null);
     }
 
-    public boolean register(String name, String algorithmClassName, String[] algorithmOptions, String evaluationClassName, String[] evaluationOptions);
+    /**
+     * @param name algorithm name
+     * @param searchClassName the fully qualified class name of the search which extends <code>{@link weka.attributeSelection.ASSearch}</code>.
+     *                        <code>{@link weka.attributeSelection.ASSearch#forName(String, String[])}</code> method is used to create search object.
+     *
+     * @param searchOptions an array of options suitable for passing to <code>{@link weka.attributeSelection.ASSearch#forName(String, String[])}</code>.
+     *                      May be null.
+     * @param evaluationClassName the fully qualified class name of the search which extends <code>{@link weka.attributeSelection.ASSearch}</code>.
+     *                            <code>{@link weka.attributeSelection.ASEvaluation#forName(String, String[])} method is used to create evaluation object</code>
+     * @param evaluationOptions an array of options suitable for passing to <code>{@link weka.attributeSelection.ASEvaluation#forName(String, String[])}</code>.
+     *                          May be null.
+     * @return <tt>true</tt> if algorithm was successfully registered, <tt>false</tt> otherwise
+     */
+    public boolean register(String name, String searchClassName, String[] searchOptions, String evaluationClassName, String[] evaluationOptions);
 
-    public default boolean register(String name, String algorithmClassName, String evaluationClassName, File jarFile) {
-        return register(name, algorithmClassName, null, evaluationClassName, null, jarFile);
+    /**
+     * @see #register(String, String, String[], String, String[], java.io.File)
+     */
+    public default boolean register(String name, String searchClassName, String evaluationClassName, File jarFile) {
+        return register(name, searchClassName, null, evaluationClassName, null, jarFile);
     }
 
-    public boolean register(String name, String algorithmClassName, String[] algorithmOptions, String evaluationClassName, String[] evaluationOptions, File jarFile);
+    /**
+     * @param name algorithm name
+     * @param searchClassName the fully qualified class name of the search which extends <code>{@link weka.attributeSelection.ASSearch}</code>.
+     *                        <code>{@link weka.attributeSelection.ASSearch#forName(String, String[])}</code> method is used to create search object.
+     *
+     * @param searchOptions an array of options suitable for passing to <code>{@link weka.attributeSelection.ASSearch#forName(String, String[])}</code>.
+     *                      May be null.
+     * @param evaluationClassName the fully qualified class name of the search which extends <code>{@link weka.attributeSelection.ASSearch}</code>.
+     *                            <code>{@link weka.attributeSelection.ASEvaluation#forName(String, String[])} method is used to create evaluation object</code>
+     * @param evaluationOptions an array of options suitable for passing to <code>{@link weka.attributeSelection.ASEvaluation#forName(String, String[])}</code>.
+     *                          May be null.
+     * @param jarFile file with compiled code of search and evaluation
+     * @return <tt>true</tt> if algorithm was successfully registered, <tt>false</tt> otherwise
+     */
+    public boolean register(String name, String searchClassName, String[] searchOptions, String evaluationClassName, String[] evaluationOptions, File jarFile);
 }
