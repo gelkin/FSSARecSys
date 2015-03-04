@@ -3,15 +3,16 @@ package ru.ifmo.ctddev.FSSARecSys.db;
 import ru.ifmo.ctddev.FSSARecSys.calculators.FSSAlgorithm;
 
 import java.io.File;
+import java.util.List;
 
 public interface FSSAlgorithmManager {
-    public String[] getAvailableFSSAlgorithms();
+    public List<String> getAvailableFSSAlgorithms();
 
     public FSSAlgorithm get(String name);
-    public FSSAlgorithm[] get(String[] names);
+    public List<FSSAlgorithm> get(List<String> names);
 
-    public void register(String name, String className);
-    public void register(String name, String className, String[] arguments);
-    public void register(String name, String className, File jarFile);
-    public void register(String name, String className, String[] arguments, File jarFile);
+    public boolean register(String name, String algorithmClassName, String evaluationClassName);
+    public boolean register(String name, String algorithmClassName, String[] algorithmOptions, String evaluationClassName, String[] evaluationOptions);
+    public boolean register(String name, String algorithmClassName, String evaluationClassName, File jarFile);
+    public boolean register(String name, String algorithmClassName, String[] algorithmOptions, String evaluationClassName, String[] evaluationOptions, File jarFile);
 }
