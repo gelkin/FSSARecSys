@@ -12,7 +12,7 @@ public interface DataSet {
     /**
      * if it has class index it should be already applied
      */
-    public Instances getDataSet();
+    public Instances getInstances();
 
     public String[] getAvailableMeatFeatureNames();
     public double getMetaFeature(String name);
