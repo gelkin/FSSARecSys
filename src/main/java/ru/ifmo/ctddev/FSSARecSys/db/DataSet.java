@@ -4,6 +4,7 @@ import ru.ifmo.ctddev.FSSARecSys.ClassifierResult;
 import ru.ifmo.ctddev.FSSARecSys.FSSResult;
 import ru.ifmo.ctddev.FSSARecSys.calculators.ClassifierEvaluator;
 import ru.ifmo.ctddev.FSSARecSys.calculators.FSSAlgorithm;
+import ru.ifmo.ctddev.FSSARecSys.utils.MetaFeaturesVector;
 import weka.core.Instances;
 
 public interface DataSet {
@@ -16,9 +17,11 @@ public interface DataSet {
 
     public String[] getAvailableMeatFeatureNames();
     public double getMetaFeature(String name);
-    public double[] getMetaFeatures(String[] names);
+
+    public double[] getMetaFeatures(MetaFeaturesVector metaFeatures);
     public void updateMetaFeature(String name, double value);
-    public void updateMetaFeatures(String[] names, double[] values);
+
+    public void updateMetaFeatures(MetaFeaturesVector metaFeatures, double[] values);
 
     /**
      * extract and save using results:
