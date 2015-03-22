@@ -16,6 +16,12 @@ public class CreationTest {
             "ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction.statistical.MeanLinearCorrelationCoefficient",
             "ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction.statistical.MeanSkewness",
             "ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction.statistical.MeanKurtosis",
+            "ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction.informationtheoretic.NormalizedClassEntropy",
+            "ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction.informationtheoretic.MeanNormalizedFeatureEntropy",
+            "ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction.informationtheoretic.MeanMutualInformation",
+            "ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction.informationtheoretic.MaxMutualInformation",
+            "ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction.informationtheoretic.EquivalentNumberOfFeatures",
+            "ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction.informationtheoretic.NoiseSignalRatio",
     };
 
     @Test
