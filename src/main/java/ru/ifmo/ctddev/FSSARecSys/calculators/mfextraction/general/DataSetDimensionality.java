@@ -7,7 +7,7 @@ import weka.core.Instances;
 /**
  * Created by warrior on 22.03.15.
  */
-public class DataSetDimensionality implements MetaFeatureExtractor {
+public class DataSetDimensionality extends MetaFeatureExtractor {
 
     public static final String NAME = "Data set dimensionality";
 

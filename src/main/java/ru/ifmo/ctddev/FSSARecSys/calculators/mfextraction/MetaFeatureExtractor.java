@@ -1,16 +1,26 @@
 package ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction;
 
 import ru.ifmo.ctddev.FSSARecSys.db.DataSet;
+import weka.core.Attribute;
+import weka.core.Instances;
+
+import java.util.Arrays;
 
 
-public interface MetaFeatureExtractor {
-    public String getName();
+public abstract class MetaFeatureExtractor {
+    public abstract String getName();
 
     /**
      * This method should return the result of computing value for meta feature with name.
      * Any specific arguments?
      */
-    public double extract(DataSet dataSet);
+    public abstract double extract(DataSet dataSet);
+
+    protected boolean isNonClassAttributeWithType(Instances instances, int attributeIndex, int... types) {
+        Attribute attribute = instances.attribute(attributeIndex);
+        int type = attribute.type();
+        return attributeIndex != instances.classIndex() && Arrays.stream(types).anyMatch(t -> t == type);
+    }
 
     /**
      * Creates a new instance of a meta feature extractor given it's class name.

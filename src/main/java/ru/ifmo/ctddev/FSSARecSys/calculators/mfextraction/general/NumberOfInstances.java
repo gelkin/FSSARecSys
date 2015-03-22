@@ -6,7 +6,7 @@ import ru.ifmo.ctddev.FSSARecSys.db.DataSet;
 /**
  * Created by warrior on 22.03.15.
  */
-public class NumberOfInstances implements MetaFeatureExtractor {
+public class NumberOfInstances extends MetaFeatureExtractor {
 
     public static final String NAME = "Number of instances";
 

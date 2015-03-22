@@ -7,7 +7,7 @@ import weka.core.Instances;
 /**
  * Created by warrior on 22.03.15.
  */
-public class NumberOfClasses implements MetaFeatureExtractor {
+public class NumberOfClasses extends MetaFeatureExtractor {
 
     public static final String NAME = "Number of classes";
 
