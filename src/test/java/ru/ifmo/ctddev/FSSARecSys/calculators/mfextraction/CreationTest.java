@@ -12,7 +12,11 @@ public class CreationTest {
             "ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction.general.NumberOfInstances",
             "ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction.general.NumberOfFeatures",
             "ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction.general.NumberOfClasses",
-            "ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction.general.DataSetDimensionality"};
+            "ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction.general.DataSetDimensionality",
+            "ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction.statistical.MeanLinearCorrelationCoefficient",
+            "ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction.statistical.MeanSkewness",
+            "ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction.statistical.MeanKurtosis",
+    };
 
     @Test
     public void creationTest() {
