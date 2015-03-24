@@ -1,18 +1,51 @@
 package ru.ifmo.ctddev.FSSARecSys.calculators.mfextraction;
 
 import ru.ifmo.ctddev.FSSARecSys.db.DataSet;
+import weka.core.Attribute;
+import weka.core.Instances;
+
+import java.util.Arrays;
 
 
-/**
- * some there here need to be created method that can return all Classes that implement ths interface(use Reflection library)
- * or it should be converted to abstract class?
- */
-public interface MetaFeatureExtractor {
-    public String getName();
+public abstract class MetaFeatureExtractor {
+    public abstract String getName();
 
     /**
      * This method should return the result of computing value for meta feature with name.
      * Any specific arguments?
      */
-    public double extract(DataSet dataSet);
+    public abstract double extract(DataSet dataSet);
+
+    protected boolean isNonClassAttributeWithType(Instances instances, int attributeIndex, int... types) {
+        Attribute attribute = instances.attribute(attributeIndex);
+        int type = attribute.type();
+        return attributeIndex != instances.classIndex() && Arrays.stream(types).anyMatch(t -> t == type);
+    }
+
+    /**
+     * Creates a new instance of a meta feature extractor given it's class name.
+     *
+     * @param className the fully qualified class name of the meta feature extractor
+     * @return new instance of the meta feature extractor. If the extractor name is invalid return null
+     */
+    public static MetaFeatureExtractor forName(String className) {
+        Class<?> clazz;
+        try {
+            clazz = Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+        if (!MetaFeatureExtractor.class.isAssignableFrom(clazz)) {
+            return null;
+        }
+        Object newInstance;
+        try {
+            newInstance = clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return (MetaFeatureExtractor) newInstance;
+    }
 }
