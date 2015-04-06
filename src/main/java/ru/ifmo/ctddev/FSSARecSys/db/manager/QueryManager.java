@@ -21,7 +21,7 @@ public class QueryManager {
 
     //  Database credentials
     public static final String USER = "root";
-    public static final String PASS = "let'srock";
+    public static final String PASS = "password";
 
     public QueryManager(String DB_URL, String USER, String PASS) {
         this.dbHandler = new DBWrapper(DB_URL, USER, PASS);
