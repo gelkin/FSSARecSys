@@ -37,7 +37,7 @@ public class ClassifierEvaluatorImpl implements ClassifierEvaluator {
                 Instance instance = test.instance(i);
                 if (!instance.classIsMissing()) {
                     int classIndex = (int) localClassifier.classifyInstance(instance);
-                    confusionMatrix[classIndex][instance.classIndex()]++;
+                    confusionMatrix[classIndex][(int) instance.classValue()]++;
                 }
             }
             Pair<Double, Double> result = computeAccuracyAndF1Measure(confusionMatrix);
