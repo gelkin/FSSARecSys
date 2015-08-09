@@ -1,8 +1,11 @@
 package ru.ifmo.ctddev.FSSARecSys.db.manager;
 
 //import ru.ifmo.ctddev.FSSARecSys.calculators.*;
+import ru.ifmo.ctddev.FSSARecSys.calculators.*;
 import ru.ifmo.ctddev.FSSARecSys.db.internal.*;
 import ru.ifmo.ctddev.FSSARecSys.db.dbWraper.*;
+import ru.ifmo.ctddev.FSSARecSys.db.internal.FSSAlgorithm;
+import weka.core.converters.ArffLoader;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,27 +34,20 @@ public class QueryManager {
     //Dataset
     public void addDataset(Dataset dataset) throws Exception {
         DBWrapper.addDataset(dataset);
-
-//        Thread tread = new Thread(new Runnable() {
-//            public void run () {
-//                try {
-//                    DBWrapper.addDataset(dataset);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//        tread.start();
     }
 
     public Dataset getDataset(String name) throws Exception {
         return dbHandler.getDataset(name);
     }
 
+    public ArrayList<Dataset> getAvailableDatasets() { return null;}
+
     //Meta Features
     public void addMetaFeature(String name, String classPath) throws Exception {
         dbHandler.addMetafeature(name, classPath);
     }
+
+    public ArrayList<String> getAvailableMetaFeatures() {return null;}
 
     //Dataset Features
     public void addMFforDataset(String datasetName, String metaFeatureName, double value) throws Exception {
@@ -59,7 +55,15 @@ public class QueryManager {
     }
 
     public Double getMFforDataset(String datasetName, String metaFeature) throws Exception {
-        return DBWrapper.getMFforDataset(datasetName, metaFeature);
+        return dbHandler.getMFforDataset(datasetName, metaFeature);
+    }
+
+    public Double getMaxMFValue(String mfName) throws Exception {
+        return dbHandler.getMaxMFValue(mfName);
+    }
+
+    public Double getMinMFValue(String mfName) throws Exception {
+        return dbHandler.getMinMFValue(mfName);
     }
 
     //MLAlgorithm
@@ -71,16 +75,21 @@ public class QueryManager {
         return dbHandler.getMLAlgorithm(algo);
     }
 
+    public ArrayList<MLAlgorithm> getAvailableMLAlgorithms() {return null;}
+
     // Params
     public void addParam(String paramName) throws Exception {
         dbHandler.addParam(paramName);
     }
+
+    public ArrayList<String> getAvailableParams() {return null;}
 
     //FSS Algorithm
     public void addFSSAlgorithm(FSSAlgorithm fssAlgorithm) throws Exception {
         dbHandler.addFSAlgorithm(fssAlgorithm);
     }
 
+    public ArrayList<FSSAlgorithm> getAvailableFssAlgorithms() {return null;}
 
     //Metric Params
     public void addMetricParam(Metrics metrics, String paramName, MLAlgorithm algo, Double value) throws Exception {

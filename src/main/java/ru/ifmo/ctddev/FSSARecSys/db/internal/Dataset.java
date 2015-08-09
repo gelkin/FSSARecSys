@@ -6,8 +6,11 @@ import ru.ifmo.ctddev.FSSARecSys.calculators.FSSAlgorithm;
 import ru.ifmo.ctddev.FSSARecSys.db.DataSet;
 import ru.ifmo.ctddev.FSSARecSys.utils.MetaFeaturesVector;
 import weka.core.Instances;
+import weka.core.converters.ArffLoader;
+import weka.core.converters.ConverterUtils;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by sergey on 26.03.15.
@@ -29,6 +32,13 @@ public class Dataset implements DataSet{
 
     @Override
     public Instances getInstances() {
+        try {
+            ConverterUtils.DataSource dataSource = new ConverterUtils.DataSource(file.getPath());
+            return dataSource.getDataSet();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 

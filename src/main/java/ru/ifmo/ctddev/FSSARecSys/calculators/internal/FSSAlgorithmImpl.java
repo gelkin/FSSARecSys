@@ -23,6 +23,11 @@ public class FSSAlgorithmImpl implements FSSAlgorithm {
         this.name = Objects.requireNonNull(name);
         this.search = Objects.requireNonNull(search);
         this.evaluation = Objects.requireNonNull(evaluation);
+//        try {
+//            Object a = Class.forName("weka.attributeSelection.ASSearch");
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Override

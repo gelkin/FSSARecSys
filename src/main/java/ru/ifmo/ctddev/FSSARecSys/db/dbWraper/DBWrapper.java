@@ -96,6 +96,16 @@ public class DBWrapper {
         return result;
     }
 
+    public static ArrayList<Dataset> getAllDatasets() throws Exception {
+        readDataBase();
+
+        PreparedStatement preparedStatement = connect
+                .prepareStatement("select * from FSS.Dataset");
+        ResultSet resultSet = preparedStatement.executeQuery();
+        //resultSet.get
+        return null;
+    }
+
     private static int getDatasetIdByName(String name) throws Exception{
         ResultSet resultSet = getDatasetRecord(name);
         if (resultSet.next())
@@ -217,10 +227,8 @@ public class DBWrapper {
             Thread t = getThreadByName(datasetName + mfName);
             if (t == null) {
                 evaluationManager = new Thread(new Runnable() {
-                    public void run()
-                    {
+                    public void run() {
                         //херовое место c вычислительным менеджером
-                        //Double value = EvaluateManager.evaluate(datasetName, mfName, classPath);
                         Double value = null;
                         try {
                             value = EvaluationManager.evaluate(getDataset(datasetName), classPath);
@@ -252,6 +260,28 @@ public class DBWrapper {
             }
             return result;
         }
+    }
+
+    //MinMaxMF
+
+    public Double getMaxMFValue(String mfName) throws Exception {
+        readDataBase();
+        PreparedStatement preparedStatement = connect
+                .prepareStatement("select max (DatasetFeatures.value) as MaxMf from FSS.DatasetFeatures where " +
+                        "idMf = (select MetaFeatures.id from MetaFeatures where MetaFeatures.name = ?)");
+        preparedStatement.setString(1, mfName);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        return resultSet.getDouble(1);
+    }
+
+    public Double getMinMFValue(String mfName) throws Exception {
+        readDataBase();
+        PreparedStatement preparedStatement = connect
+                .prepareStatement("select min (DatasetFeatures.value) as MinMf from FSS.DatasetFeatures where " +
+                        "idMf = (select MetaFeatures.id from MetaFeatures where MetaFeatures.name = ?)");
+        preparedStatement.setString(1, mfName);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        return resultSet.getDouble(1);
     }
 
     //MLAlgorithm
@@ -304,6 +334,7 @@ public class DBWrapper {
     }
 
     //Params
+
     public static boolean addParam(String name) throws Exception{
         readDataBase();
 

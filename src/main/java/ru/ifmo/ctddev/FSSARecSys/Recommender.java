@@ -2,7 +2,10 @@ package ru.ifmo.ctddev.FSSARecSys;
 
 import ru.ifmo.ctddev.FSSARecSys.calculators.ClassifierEvaluator;
 import ru.ifmo.ctddev.FSSARecSys.calculators.FSSAlgorithm;
+import ru.ifmo.ctddev.FSSARecSys.calculators.*;
+import ru.ifmo.ctddev.FSSARecSys.calculators.internal.NearestDataSetSearcherImpl;
 import ru.ifmo.ctddev.FSSARecSys.db.DataSet;
+import ru.ifmo.ctddev.FSSARecSys.db.internal.Dataset;
 import ru.ifmo.ctddev.FSSARecSys.utils.Pair;
 
 import java.util.Collection;
@@ -14,9 +17,9 @@ public class Recommender {
     private Collection<FSSAlgorithm> algorithms;  // todo = FSSAlgorithms.ALL
 
     public RecommendationResult recommend(DataSet dataSet) {
-//        Pair<Double, DataSet>[] dataSetDistances = NearestDataSetSearcher.search(dataSet, 10);
-//        Pair<Double, DataSet>[] dataSetsEARRs = EARRComputer.calculate(evaluator, algorithms, dataSetDistances);
-//        return FSSAlgorithmRanker.rank(dataSetDistances, dataSetsEARRs, alpha, betta);
+        //Pair<Double, DataSet>[] dataSetDistances = NearestDataSetSearcherImpl.search(dataSet, 10);
+        //Pair<Double, DataSet>[] dataSetsEARRs = EARRComputer.calculate(evaluator, algorithms, dataSetDistances);
+        //return FSSAlgorithmRanker.rank(dataSetDistances, dataSetsEARRs, alpha, betta);
         return null;
     }
 
@@ -25,6 +28,7 @@ public class Recommender {
     }
 
     public Recommender setClassifier(ClassifierEvaluator classifierEvaluator) {
+        this.classifierEvaluator = classifierEvaluator;
         return this;
     }
 
@@ -32,10 +36,13 @@ public class Recommender {
      * setting set of algorithms that are used for recomendation
      */
     public Recommender setAlgorithmsSet(Collection<FSSAlgorithm> algorithms) {
+        this.algorithms = algorithms;
         return this;
     }
 
     public Recommender setParameters(float alpha, float betta) {
+        this.alpha = alpha;
+        this.betta = betta;
         return this;
     }
 
