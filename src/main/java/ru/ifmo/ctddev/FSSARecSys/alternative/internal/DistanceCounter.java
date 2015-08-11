@@ -1,14 +1,10 @@
 package ru.ifmo.ctddev.FSSARecSys.alternative.internal;
 
-import ru.ifmo.ctddev.FSSARecSys.db.internal.Dataset;
-import ru.ifmo.ctddev.FSSARecSys.db.manager.QueryManager;
-import ru.ifmo.ctddev.FSSARecSys.utils.MFVector;
-import ru.ifmo.ctddev.FSSARecSys.utils.MetaFeaturesVector;
-import ru.ifmo.ctddev.FSSARecSys.utils.Pair;
+import ru.ifmo.ctddev.FSSARecSys.db.internal.*;
+import ru.ifmo.ctddev.FSSARecSys.db.manager.*;
+import ru.ifmo.ctddev.FSSARecSys.utils.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Created by Сергей on 03.08.2015.

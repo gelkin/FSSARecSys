@@ -40,7 +40,7 @@ public class QueryManager {
         return dbHandler.getDataset(name);
     }
 
-    public ArrayList<Dataset> getAvailableDatasets() { return null;} //todo: implement in DBWrapper
+    public ArrayList<Dataset> getAllClassificationDatasets() throws Exception { return dbHandler.getAllClassificationDatasets();}
 
     //Meta Features
     public void addMetaFeature(String name, String classPath) throws Exception {
@@ -89,7 +89,7 @@ public class QueryManager {
         dbHandler.addFSAlgorithm(fssAlgorithm);
     }
 
-    public ArrayList<FSSAlgorithm> getAvailableFssAlgorithms() {return null;} //todo: implement in DBWrapper
+    public ArrayList<FSSAlgorithm> getAvailableFssAlgorithms() throws Exception {return dbHandler.getAvailableFSSAlgorithms();}
 
     //Metric Params
     public void addMetricParam(Metrics metrics, String paramName, MLAlgorithm algo, Double value) throws Exception {
@@ -104,8 +104,8 @@ public class QueryManager {
         return null; //todo: implement in DBWrapper
     }
 
-    public EARRParams getEARRParams(Metrics metrics, MLAlgorithm algo) {
-        return null; //todo: implement in DBWrapper
+    public EARRParams getEARRParams(Metrics metrics, MLAlgorithm algo) throws Exception {
+        return dbHandler.getEARRParams(metrics, algo);
     }
 
     // Metrics

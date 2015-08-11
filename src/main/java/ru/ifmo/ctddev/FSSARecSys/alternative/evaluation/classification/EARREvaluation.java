@@ -2,11 +2,7 @@ package ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.classification;
 
 import ru.ifmo.ctddev.FSSARecSys.ClassifierResult;
 import ru.ifmo.ctddev.FSSARecSys.FSSResult;
-import ru.ifmo.ctddev.FSSARecSys.db.internal.Dataset;
-import ru.ifmo.ctddev.FSSARecSys.db.internal.EARRParams;
-import ru.ifmo.ctddev.FSSARecSys.db.internal.FSSAlgorithm;
-import ru.ifmo.ctddev.FSSARecSys.db.internal.MLAlgorithm;
-import ru.ifmo.ctddev.FSSARecSys.db.internal.Metrics;
+import ru.ifmo.ctddev.FSSARecSys.db.internal.*;
 import ru.ifmo.ctddev.FSSARecSys.db.manager.QueryManager;
 import weka.attributeSelection.ASEvaluation;
 import weka.attributeSelection.ASSearch;

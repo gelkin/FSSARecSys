@@ -96,14 +96,34 @@ public class DBWrapper {
         return result;
     }
 
-    public static ArrayList<Dataset> getAllDatasets() throws Exception {
+    public static ArrayList<Dataset> getAllClassificationDatasets() throws Exception {
         readDataBase();
 
         PreparedStatement preparedStatement = connect
-                .prepareStatement("select * from FSS.Dataset");
+                .prepareStatement("select * from FSS.Dataset where taskType = 'classification'");
         ResultSet resultSet = preparedStatement.executeQuery();
-        //resultSet.get
-        return null;
+        Dataset currDataset = null;
+
+        ArrayList<Dataset> result = new ArrayList<>();
+
+        while (resultSet.next()) {
+            Blob blob = resultSet.getBlob(3);
+            InputStream in = blob.getBinaryStream();
+            String name = resultSet.getString(2);
+            File file = new File(name + ".arff");
+            OutputStream out = new FileOutputStream(file);
+            byte[] buff = blob.getBytes(1, (int) blob.length());  // how much of the blob to read/write at a time
+            int len = 0;
+            while ((len = in.read(buff)) != -1) {
+                out.write(buff, 0, len);
+            }
+            String taskType = resultSet.getString(4);
+            currDataset = new Dataset(name, file, taskType);
+
+            result.add(currDataset);
+        }
+
+        return result;
     }
 
     private static int getDatasetIdByName(String name) throws Exception{
@@ -437,6 +457,23 @@ public class DBWrapper {
         return result;
     }
 
+    public static ArrayList<FSSAlgorithm> getAvailableFSSAlgorithms() throws Exception {
+        readDataBase();
+        PreparedStatement preparedStatement = connect
+                .prepareStatement("select * from FSS.FSAlgorithm");
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        ArrayList<FSSAlgorithm> result = new ArrayList<>();
+        FSSAlgorithm currAlgorithm = null;
+
+        while (resultSet.next()) {
+            currAlgorithm = new FSSAlgorithm(resultSet.getString(2), resultSet.getString(3),
+                    resultSet.getString(4), resultSet.getString(5), resultSet.getString(6));
+            result.add(currAlgorithm);
+        }
+        return result;
+    }
+
     //Metrics
 
     public static boolean addMetrics(Metrics metrics) throws Exception {
@@ -583,4 +620,31 @@ public class DBWrapper {
         return result;
     }
 
+    public static EARRParams getEARRParams(Metrics metrics, MLAlgorithm algo) throws Exception {
+        readDataBase();
+
+        int metricsId = getMetricsId(metrics);
+        int mlAlgoId = getMLAlgorithmId(algo);
+        EARRParams result = null;
+
+        PreparedStatement preparedStatement = connect
+                .prepareStatement("select * from FSS.MetricParams " +
+                        "where idMetric = ? and idMLAlgo = ? and idParams = (select Params.id from Params where " +
+                        "name = 'accuracy' or name = 'number of selected features' " +
+                        "or name = 'selection time')");
+        preparedStatement.setInt(1, metricsId);
+        preparedStatement.setInt(2, mlAlgoId);
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        Map<String, Double> mapedParams = new HashMap<String, Double>();
+        while (resultSet.next()){
+            mapedParams.put(getParamNameById(resultSet.getInt(3)), resultSet.getDouble(4));
+        }
+
+        if (!mapedParams.isEmpty())
+            result = new EARRParams(mapedParams.get("accuracy"),
+                    mapedParams.get("number of selected features"), mapedParams.get("selectionTime"));
+
+        return result;
+    }
 }

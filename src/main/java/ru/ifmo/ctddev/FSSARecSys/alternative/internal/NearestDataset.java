@@ -1,6 +1,5 @@
 package ru.ifmo.ctddev.FSSARecSys.alternative.internal;
 
-import ru.ifmo.ctddev.FSSARecSys.calculators.NearestDataSetSearcher;
 import ru.ifmo.ctddev.FSSARecSys.db.DataSet;
 import ru.ifmo.ctddev.FSSARecSys.db.internal.Dataset;
 import ru.ifmo.ctddev.FSSARecSys.db.manager.QueryManager;
@@ -24,7 +23,7 @@ public class NearestDataset {
     }
 
     public Pair<Double, Dataset>[] search(Dataset dataset, int n) throws Exception {
-        ArrayList<Dataset> others = queryManager.getAvailableDatasets();
+        ArrayList<Dataset> others = queryManager.getAllClassificationDatasets();
         PriorityQueue<Pair<Double, DataSet>> pq = new PriorityQueue<>(others.size(),
                 (o1, o2) -> Double.compare(o1.first, o2.first)
         );
