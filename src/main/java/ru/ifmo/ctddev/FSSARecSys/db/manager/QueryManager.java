@@ -40,14 +40,14 @@ public class QueryManager {
         return dbHandler.getDataset(name);
     }
 
-    public ArrayList<Dataset> getAvailableDatasets() { return null;}
+    public ArrayList<Dataset> getAvailableDatasets() { return null;} //todo: implement in DBWrapper
 
     //Meta Features
     public void addMetaFeature(String name, String classPath) throws Exception {
         dbHandler.addMetafeature(name, classPath);
     }
 
-    public ArrayList<String> getAvailableMetaFeatures() {return null;}
+    public ArrayList<String> getAvailableMetaFeatures() {return null;} //todo: implement in DBWrapper
 
     //Dataset Features
     public void addMFforDataset(String datasetName, String metaFeatureName, double value) throws Exception {
@@ -75,29 +75,37 @@ public class QueryManager {
         return dbHandler.getMLAlgorithm(algo);
     }
 
-    public ArrayList<MLAlgorithm> getAvailableMLAlgorithms() {return null;}
+    public ArrayList<MLAlgorithm> getAvailableMLAlgorithms() {return null;} //todo: implement in DBWrapper
 
     // Params
     public void addParam(String paramName) throws Exception {
         dbHandler.addParam(paramName);
     }
 
-    public ArrayList<String> getAvailableParams() {return null;}
+    public ArrayList<String> getAvailableParams() {return null;} //todo: implement in DBWrapper
 
     //FSS Algorithm
     public void addFSSAlgorithm(FSSAlgorithm fssAlgorithm) throws Exception {
         dbHandler.addFSAlgorithm(fssAlgorithm);
     }
 
-    public ArrayList<FSSAlgorithm> getAvailableFssAlgorithms() {return null;}
+    public ArrayList<FSSAlgorithm> getAvailableFssAlgorithms() {return null;} //todo: implement in DBWrapper
 
     //Metric Params
     public void addMetricParam(Metrics metrics, String paramName, MLAlgorithm algo, Double value) throws Exception {
         dbHandler.addMetricsParams(metrics, paramName, algo, value);
     }
 
-    public Map<String, Double> getMetricParams(Metrics metrics, MLAlgorithm algo) throws Exception {
+    public Map<String, Double> getMetricParamsList(Metrics metrics, MLAlgorithm algo) throws Exception {
        return dbHandler.getMetricParams(metrics, algo);
+    }
+
+    public Double getMetricParamValue(Metrics metrics, MLAlgorithm algo, String paramName) {
+        return null; //todo: implement in DBWrapper
+    }
+
+    public EARRParams getEARRParams(Metrics metrics, MLAlgorithm algo) {
+        return null; //todo: implement in DBWrapper
     }
 
     // Metrics
