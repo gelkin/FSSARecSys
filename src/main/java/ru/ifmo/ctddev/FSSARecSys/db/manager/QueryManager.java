@@ -114,7 +114,7 @@ public class QueryManager {
     }
 
     public Metrics getMetrics(Metrics metrics) throws Exception {
-        return DBWrapper.getMetrics(metrics);
+        return dbHandler.getMetrics(metrics);
     }
 
 }
