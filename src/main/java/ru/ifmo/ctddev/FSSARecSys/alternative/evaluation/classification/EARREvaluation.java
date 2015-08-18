@@ -10,6 +10,7 @@ import weka.classifiers.Classifier;
 import weka.core.Instances;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -44,15 +45,6 @@ public class EARREvaluation {
 
             Instances datasetInstances = dataset.getInstances();
 
-            int trainSize = (int) Math.round(datasetInstances.numInstances() * 0.8);
-            int testSize = datasetInstances.numInstances() - trainSize;
-            Instances train = new Instances(datasetInstances, 0, trainSize);
-            Instances test = new Instances(datasetInstances, trainSize, testSize);
-
-            Classifier classifier = Classifier.forName(mlAlgorithm.getClassPath(), weka.core.Utils.splitOptions(mlAlgorithm.getOptions()));
-            ClassifierEvaluator classifierEvaluator = new ClassifierEvaluator(mlAlgorithm.getName(), classifier);
-            Double accuracy = classifierEvaluator.evaluate(mlAlgorithm.getName(), train, test).accuracy;
-
             ASSearch asSearch = ASSearch.forName(algo.getSearchClass(), weka.core.Utils.splitOptions(algo.getSearchOptions()));
             ASEvaluation asEvaluation = ASEvaluation.forName(algo.getEvalClass(), weka.core.Utils.splitOptions(algo.getEvalOptions()));
 
@@ -61,6 +53,28 @@ public class EARREvaluation {
 
             Integer numberOfSelectedFeatures = fssResult.numberOfSelectedFeatures;
             Long selectionTime = fssResult.selectionTime;
+
+            ArrayList<Integer> unusedFeatures = new ArrayList<>();
+            for (int i = 0; i < dataset.getInstances().numAttributes(); i++){
+                unusedFeatures.add(i);
+            }
+
+            for (Integer i: fssResult.selectedFeatures) {
+                unusedFeatures.remove(i);
+            }
+
+            for (Integer i: unusedFeatures){
+                datasetInstances.deleteAttributeAt(i);
+            }
+
+            int trainSize = (int) Math.round(datasetInstances.numInstances() * 0.8);
+            int testSize = datasetInstances.numInstances() - trainSize;
+            Instances train = new Instances(datasetInstances, 0, trainSize);
+            Instances test = new Instances(datasetInstances, trainSize, testSize);
+
+            Classifier classifier = Classifier.forName(mlAlgorithm.getClassPath(), weka.core.Utils.splitOptions(mlAlgorithm.getOptions()));
+            ClassifierEvaluator classifierEvaluator = new ClassifierEvaluator(mlAlgorithm.getName(), classifier);
+            Double accuracy = classifierEvaluator.evaluate(mlAlgorithm.getName(), train, test).accuracy;
 
             newParams = new EARRParams(accuracy, numberOfSelectedFeatures.doubleValue(), selectionTime.doubleValue());
 
