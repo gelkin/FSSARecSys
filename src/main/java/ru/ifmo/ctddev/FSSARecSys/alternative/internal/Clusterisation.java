@@ -16,6 +16,7 @@ import java.util.Objects;
 public class Clusterisation {
 
     private ArrayList<Instances> clusters;
+    private Instances unitedClusters;
     private Instances centroids;
     private Clusterer clusterer;
 
@@ -26,6 +27,8 @@ public class Clusterisation {
         this.clusters = clusters;
         this.clusterer = Objects.requireNonNull(clusterer);
         numOfClusters = clusters.size();
+
+        unitedClusters = getAllInstances();
     }
 
     public Integer getNumClusters(){
@@ -60,6 +63,52 @@ public class Clusterisation {
             ClusterCentroid ct = new ClusterCentroid();
             return ct.findCentroid(clusterNum, clusters.get(clusterNum));
         }
+    }
+
+    private Instances getAllInstances(){
+        Instances all = new Instances(clusters.get(0));
+        for (Instances cluster: clusters) {
+            for (int i = 1; i < cluster.numInstances(); i++){
+                all.add(cluster.instance(i));
+            }
+        }
+        return all;
+    }
+
+    public Double DunnIndex(){
+
+        //get max inter-cluster distance
+
+        EuclideanDistance allInstancedDist = new EuclideanDistance(unitedClusters);
+
+        Double maxTotal = Double.MIN_VALUE;
+        Double maxForCluster = Double.MIN_VALUE;
+        for (int i = 0; i < numOfClusters; i++) {
+            Instances currCluster = clusters.get(i);
+            maxTotal = Double.MIN_VALUE;
+            maxForCluster = Double.MIN_VALUE;
+            for (int j = 0; j < currCluster.numInstances(); j++) {
+                Instance currInstance = currCluster.instance(j);
+                maxForCluster = Double.MIN_VALUE;
+                for (int k = 0; k < currCluster.numInstances(); k++) {
+                    if (j != k)
+                        maxForCluster = Double.max(maxForCluster,
+                                allInstancedDist.distance(currInstance, currCluster.instance(k)));
+                }
+            }
+            maxTotal = Double.max(maxTotal, maxForCluster);
+        }
+
+        //get min intra-cluster distance
+
+        boolean [][] intraClusterMatrix = new boolean[numOfClusters][numOfClusters];
+        
+        for (int i = 0; i < numOfClusters; i++) {
+            for (int j = 0; j < numOfClusters; j++) {
+
+            }
+        }
+        return 0.0;
     }
 
     public Double DaviesBouldinIndex() throws Exception {
@@ -106,6 +155,11 @@ public class Clusterisation {
         }
 
         return result / numOfClusters;
+    }
+
+    public Double silhouetteIndex(){
+
+        return 0.0;
     }
 
 }
