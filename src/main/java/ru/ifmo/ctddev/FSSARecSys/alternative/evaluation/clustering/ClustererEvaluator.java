@@ -1,9 +1,7 @@
 package ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.clustering;
 
 import weka.classifiers.Classifier;
-import weka.clusterers.AbstractClusterer;
-import weka.clusterers.ClusterEvaluation;
-import weka.clusterers.Clusterer;
+import weka.clusterers.*;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -25,23 +23,26 @@ public class ClustererEvaluator {
         return name;
     }
 
-    public ClustererResult evaluate(String datasetName, Instances train, Instances test) {
+    public ClustererResult evaluate(String datasetName, Instances data) {
 
-        //ClusterEvaluation clusterEvaluation = new ClusterEvaluation();
         try {
             Clusterer abstractClusterer = AbstractClusterer.makeCopy(clusterer);
-            abstractClusterer.buildClusterer(train);
 
-            //abstractClusterer.
-            for (int i = 0; i < train.numInstances(); i++) {
-                Instance instance = train.instance(i);
+            ClusterEvaluation eval = new ClusterEvaluation();
+            eval.setClusterer(abstractClusterer);
+            eval.getClusterAssignments();
+            eval.evaluateClusterer(new Instances(data));
+            double[] tmpDistribution = eval.getClusterAssignments();
+            int[] clusterAssignments = new int[data.numInstances()];
 
+            for (int i = 0; i < data.numInstances(); i++) {
+                clusterAssignments[i] = (int) tmpDistribution[i];
             }
+            
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //localClusterer.buildClusterer();
 
         return null;
     }

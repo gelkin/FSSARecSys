@@ -35,27 +35,6 @@ public class Clusterisation {
         return numOfClusters;
     }
 
-    //** dunno if needed **
-
-    public Double averageInterClusterDistance(int clusterNum) {
-        Instances cluster = clusters.get(clusterNum);
-        EuclideanDistance distance = new EuclideanDistance(cluster);
-        Double avg = 0.0;
-        for (int i = 0; i < cluster.numInstances(); i++)
-            for (int j = 0; j < cluster.numInstances(); j++){
-                if (i != j) {
-                    avg += distance.distance(cluster.instance(i), cluster.instance(j));
-                }
-            }
-        avg /= (Math.pow(cluster.numInstances(), 2.0) - cluster.numInstances());
-        return avg;
-    }
-
-    public Double averageIntraClusterDistance() {
-        return null;
-    }
-    //**
-
     public Instance getClusterCentroid(int clusterNum) throws Exception {
         if (clusterer instanceof SimpleKMeans) {
             return ((SimpleKMeans) clusterer).getClusterCentroids().instance(clusterNum);
