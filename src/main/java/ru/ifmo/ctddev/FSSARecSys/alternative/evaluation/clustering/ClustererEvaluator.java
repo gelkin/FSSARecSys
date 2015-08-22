@@ -1,10 +1,12 @@
 package ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.clustering;
 
+import ru.ifmo.ctddev.FSSARecSys.alternative.internal.Clusterisation;
 import weka.classifiers.Classifier;
 import weka.clusterers.*;
 import weka.core.Instance;
 import weka.core.Instances;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -38,7 +40,17 @@ public class ClustererEvaluator {
             for (int i = 0; i < data.numInstances(); i++) {
                 clusterAssignments[i] = (int) tmpDistribution[i];
             }
-            
+
+            int numClusters = eval.getNumClusters();
+            ArrayList<Instances> clusters = new ArrayList<>(numClusters);
+
+            for (int i = 0; i < data.numInstances(); i++) {
+                clusters.get(clusterAssignments[i]).add(data.instance(i));
+            }
+
+            Clusterisation clusterisation = new Clusterisation(clusters, clusterer);
+
+            return new ClustererResult(clusterisation.DaviesBouldinIndex(), clusterisation.DunnIndex(), clusterisation.silhouetteIndex());
 
         } catch (Exception e) {
             e.printStackTrace();
