@@ -1,8 +1,13 @@
 package ru.ifmo.ctddev.FSSARecSys.alternative.evaluation;
 
 import ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.classification.*;
+import ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.clustering.ClustererEvaluator;
+import ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.clustering.ClustererResult;
 import ru.ifmo.ctddev.FSSARecSys.db.internal.*;
 import ru.ifmo.ctddev.FSSARecSys.db.manager.*;
+import weka.clusterers.AbstractClusterer;
+import weka.clusterers.Clusterer;
+import weka.core.Instances;
 
 import java.util.*;
 
@@ -33,12 +38,24 @@ public class Evaluator {
                 if (queryManager.getDataset(dataset.getName()) == null) {
                     queryManager.addDataset(dataset);
                 }
-                ArrayList<FSSAlgorithm> availableFSSAlgorithms = queryManager.getAvailableFssAlgorithms(); //todo: get from db
+                ArrayList<FSSAlgorithm> availableFSSAlgorithms = queryManager.getAvailableFssAlgorithms();
 
                 EARREvaluation  earrEvaluation = new EARREvaluation(alpha, betta, queryManager);
                 return earrEvaluation.evaluate(fssAlgorithm, availableFSSAlgorithms, dataset, listOfMetaFeatures, mlAlgorithm);
             case "clusterisation":
-                break;
+                if (queryManager.getDataset(dataset.getName()) == null) {
+                    queryManager.addDataset(dataset);
+                }
+
+                Clusterer as = AbstractClusterer.forName(mlAlgorithm.getClassPath(), weka.core.Utils.splitOptions(mlAlgorithm.getOptions()));
+                ClustererEvaluator clustererEvaluator = new ClustererEvaluator(mlAlgorithm.getName(), as);
+
+                /*todo: add fss-shit for clustering (orly?)*/
+
+                ClustererResult clustererResult = clustererEvaluator.evaluate(dataset.getName(), dataset.getInstances());
+
+                return clustererResult.countSquareDistance();
+
         }
         return null;
     }
