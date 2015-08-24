@@ -29,6 +29,8 @@ public class Clusterisation {
         numOfClusters = clusters.size();
 
         unitedClusters = getAllInstances();
+
+        centroids = new Instances(clusters.get(0), 0);
     }
 
     public Integer getNumClusters(){
@@ -86,10 +88,10 @@ public class Clusterisation {
 
         Double minIntraclusterDistance = Double.MAX_VALUE;
         Double minLocalDistance = Double.MAX_VALUE;
-        for (int i = 0; i < numOfClusters; i++) {
-            for (int j = 0; j < numOfClusters; j++) {
-                if (intraClusterMatrix[j][i] == false) {
-                    intraClusterMatrix[i][j] = true;
+        for (int i = 0; i < numOfClusters - 1; i++) {
+            for (int j = i; j < numOfClusters; j++) {
+                //if (intraClusterMatrix[j][i] == false) {
+                //    intraClusterMatrix[i][j] = true;
                     Instances clusterI = clusters.get(i);
                     Instances clusterJ = clusters.get(j);
 
@@ -101,11 +103,11 @@ public class Clusterisation {
                             minLocalDistance = Double.min(minLocalDistance, allInstancedDist.distance(first, second));
                         }
                     }
-                }
+                //}
             }
             minIntraclusterDistance = Double.min(minIntraclusterDistance, minLocalDistance);
         }
-        return minIntraclusterDistance;
+        return minIntraclusterDistance / maxTotal;
     }
 
     // ** Davies-Bouldin index **
@@ -114,7 +116,12 @@ public class Clusterisation {
         //count S_i = 1 / |C_i| sum_all_xi(dist(x_i, centr_i))
 
         ArrayList<Double> sTemp = new ArrayList<>(numOfClusters);
-        ArrayList<EuclideanDistance> euclideanDistances = new ArrayList<>(clusters.size());
+        ArrayList<EuclideanDistance> euclideanDistances = new ArrayList<>(numOfClusters);
+
+        for (int i = 0; i < numOfClusters; i++){
+            sTemp.add(Double.MIN_VALUE);
+            euclideanDistances.add(new EuclideanDistance());
+        }
 
         for (int i = 0; i < numOfClusters; i++) {
             Double sumTmp = 0.0;
@@ -134,6 +141,9 @@ public class Clusterisation {
         //count D_i = max_j (i!=j) {(S_i + S_j) / dist(centr_i, centr_j)}
 
         ArrayList<Double> dTemp = new ArrayList<>(numOfClusters);
+        for (int i = 0; i < numOfClusters; i++){
+            dTemp.add(Double.MIN_VALUE);
+        }
 
         EuclideanDistance centroidDist = new EuclideanDistance(centroids);
 

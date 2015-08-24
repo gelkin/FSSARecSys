@@ -6,7 +6,10 @@ import weka.clusterers.*;
 import weka.core.Instance;
 import weka.core.Instances;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Objects;
 
 /**
@@ -28,10 +31,11 @@ public class ClustererEvaluator {
     public ClustererResult evaluate(String datasetName, Instances data) {
 
         try {
-            Clusterer abstractClusterer = AbstractClusterer.makeCopy(clusterer);
+            //Clusterer abstractClusterer = AbstractClusterer.makeCopy(clusterer);
+            clusterer.buildClusterer(data);
 
             ClusterEvaluation eval = new ClusterEvaluation();
-            eval.setClusterer(abstractClusterer);
+            eval.setClusterer(clusterer);
             eval.getClusterAssignments();
             eval.evaluateClusterer(new Instances(data));
             double[] tmpDistribution = eval.getClusterAssignments();
@@ -42,10 +46,16 @@ public class ClustererEvaluator {
             }
 
             int numClusters = eval.getNumClusters();
+
+            // Instances in = new Instances()
             ArrayList<Instances> clusters = new ArrayList<>(numClusters);
 
+            for (int i = 0; i < numClusters; i++)
+                clusters.add(new Instances(data, 0));
+
             for (int i = 0; i < data.numInstances(); i++) {
-                clusters.get(clusterAssignments[i]).add(data.instance(i));
+                if (clusterAssignments[i] != -1)
+                    clusters.get(clusterAssignments[i]).add(data.instance(i));
             }
 
             Clusterisation clusterisation = new Clusterisation(clusters, clusterer);
