@@ -90,7 +90,8 @@ public class LaplasianScore {
     private DoubleMatrix2D getL() {
         int n = numOfInstances;
 
-        DoubleMatrix2D W = getW().copy();
+        DoubleMatrix2D W = DoubleFactory2D.dense.make(numOfInstances, numOfInstances);
+        W.assign(getW());
         final DoubleMatrix1D d = DoubleFactory1D.dense.make(n);
         final DoubleMatrix1D d_minus_1_2 = DoubleFactory1D.dense.make(n);
         d_1_2 = DoubleFactory1D.dense.make(n);
@@ -136,9 +137,12 @@ public class LaplasianScore {
         return res;
     }
 
-    public Double getFeatureWeights(int featureNum) {
-        DoubleMatrix2D F = getFeatureMatrix().copy();
-        DoubleMatrix2D L = getL().copy();
+    public Double getFeatureWeight(int featureNum) {
+        DoubleMatrix2D F = DoubleFactory2D.dense.make(numOfInstances, data.numAttributes());
+        F.assign(getFeatureMatrix());
+
+        DoubleMatrix2D L = DoubleFactory2D.dense.make(numOfInstances, numOfInstances);
+        L.assign(getL());
         Algebra alg = new Algebra();
 
         DoubleMatrix2D D12 = DoubleFactory2D.sparse.diagonal(d_1_2);
