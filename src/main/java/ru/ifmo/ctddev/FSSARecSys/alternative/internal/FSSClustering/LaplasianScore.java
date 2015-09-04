@@ -1,4 +1,4 @@
-package ru.ifmo.ctddev.FSSARecSys.alternative.internal;
+package ru.ifmo.ctddev.FSSARecSys.alternative.internal.FSSClustering;
 
 import cern.colt.function.DoubleDoubleFunction;
 import cern.colt.matrix.DoubleFactory1D;
@@ -19,6 +19,17 @@ import java.util.function.Function;
  * Created by Администратор on 31.08.2015.
  */
 public class LaplasianScore {
+
+    /**
+     * Laplasian score
+     *
+     * fi^ = fi_2
+     * Lambda(L) = L;
+     *
+     * Spectral Feature Selection for
+     * Supervised and Unsupervised Learning. Zheng Zhao, Huan Liu
+     */
+
     private Instances data;
 
     private DistanceFunction distanceFunction;
@@ -151,7 +162,13 @@ public class LaplasianScore {
         DoubleMatrix1D D12ones = alg.mult(D12, eOnes);
 
         //(((D^1/2) * f)^T) * L * ((D^1/2) * f)
-        Double numerator = alg.mult(alg.mult(L, D12feature), D12feature);
+
+        DoubleMatrix2D D12featureTransposed = DoubleFactory2D.dense.make(1, numOfInstances);
+        for (int i = 0; i < numOfInstances; i++) {
+            D12featureTransposed.set(0, i, D12feature.get(i));
+        }
+
+        Double numerator = alg.mult(alg.mult(D12featureTransposed, L).viewRow(0), D12feature);
         //(((D^1/2) * f)^T) * ((D^1/2) * f) - (((((D^1/2) * f)^T) * ((D^1/2) * e)) ^ 2) / (((D^1/2) * e)^T) * ((D^1/2) * e))
         Double denominator = alg.mult(D12feature, D12feature) -
                 Math.pow(alg.mult(D12feature, D12ones), 2.0) / alg.mult(D12ones, D12ones);
@@ -159,9 +176,5 @@ public class LaplasianScore {
         return numerator / denominator;
     }
 
-
-//    public abstract DoubleMatrix2D getLambda();
-//
-//    public abstract DoubleMatrix1D evaluationFunction();
 
 }

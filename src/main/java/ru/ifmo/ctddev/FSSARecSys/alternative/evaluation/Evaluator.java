@@ -3,11 +3,12 @@ package ru.ifmo.ctddev.FSSARecSys.alternative.evaluation;
 import ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.classification.*;
 import ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.clustering.ClustererEvaluator;
 import ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.clustering.ClustererResult;
+import ru.ifmo.ctddev.FSSARecSys.alternative.internal.FSSClustering.LaplasianScore;
+import ru.ifmo.ctddev.FSSARecSys.alternative.internal.FSSClustering.SPEC;
 import ru.ifmo.ctddev.FSSARecSys.db.internal.*;
 import ru.ifmo.ctddev.FSSARecSys.db.manager.*;
-import weka.clusterers.AbstractClusterer;
-import weka.clusterers.Clusterer;
-import weka.core.Instances;
+import weka.clusterers.*;
+import weka.core.EuclideanDistance;
 
 import java.io.File;
 import java.util.*;
@@ -56,6 +57,21 @@ public class Evaluator {
                 ClustererEvaluator clustererEvaluator = new ClustererEvaluator(mlAlgorithm.getName(), as);
 
                 /*todo: add fss-shit for clustering (orly?)*/
+                //SpectralClusterer sp = new SpectralClusterer();
+
+                //DoubleMatrix2D d = DoubleFactory2D.dense.make(3864025, 3864025);
+                System.out.println("Laplasian scores:");
+                LaplasianScore laplasianScore = new LaplasianScore(dataset.getInstances(), new EuclideanDistance());
+
+                for (int i = 0; i < dataset.getInstances().numAttributes(); i++)
+                    System.out.println(laplasianScore.getFeatureWeight(i));
+
+                System.out.println("SPEC scores:");
+                SPEC spec = new SPEC(dataset.getInstances(), new EuclideanDistance());
+
+                for (int i = 0; i < dataset.getInstances().numAttributes(); i++)
+                    System.out.println(spec.getFeatureWeight(i));
+
 
                 ClustererResult clustererResult = clustererEvaluator.evaluate(dataset.getName(), dataset.getInstances());
 
@@ -67,8 +83,8 @@ public class Evaluator {
 
     public static void main(String [] args)
     {
-        File f = new File("nursery.arff");
-        Dataset dataset = new Dataset("nursery", f, "clusterisation");
+        File f = new File("car.arff");
+        Dataset dataset = new Dataset("car", f, "clusterisation");
 
         MLAlgorithm ml = new MLAlgorithm("first_blood", "weka.clusterers.SimpleKMeans", "", "clusterisation");
 
@@ -78,7 +94,7 @@ public class Evaluator {
         Evaluator e = new Evaluator();
 
         try {
-            System.out.print(e.evaluate(null, dataset, ml));
+            System.out.print("My evaluator: " + e.evaluate(null, dataset, ml));
         } catch (Exception e1) {
             e1.printStackTrace();
         }
