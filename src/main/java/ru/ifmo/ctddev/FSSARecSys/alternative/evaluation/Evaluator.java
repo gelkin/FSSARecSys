@@ -1,5 +1,7 @@
 package ru.ifmo.ctddev.FSSARecSys.alternative.evaluation;
 
+import cern.colt.map.AbstractIntDoubleMap;
+import cern.colt.map.OpenIntDoubleHashMap;
 import ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.classification.*;
 import ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.clustering.ClustererEvaluator;
 import ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.clustering.ClustererResult;
@@ -9,6 +11,7 @@ import ru.ifmo.ctddev.FSSARecSys.db.internal.*;
 import ru.ifmo.ctddev.FSSARecSys.db.manager.*;
 import weka.clusterers.*;
 import weka.core.EuclideanDistance;
+import weka.core.Instances;
 
 import java.io.File;
 import java.util.*;
@@ -63,15 +66,30 @@ public class Evaluator {
                 System.out.println("Laplasian scores:");
                 LaplasianScore laplasianScore = new LaplasianScore(dataset.getInstances(), new EuclideanDistance());
 
-                for (int i = 0; i < dataset.getInstances().numAttributes(); i++)
-                    System.out.println(laplasianScore.getFeatureWeight(i));
+                Map<Double, Integer> laplas = new TreeMap<>();
+                for (int i = 0; i < dataset.getInstances().numAttributes(); i++) {
+                    Double val = laplasianScore.getFeatureWeight(i);
+                    //System.out.println(val);
+                    laplas.put(val, i);
+                }
+
+                for (Map.Entry<Double, Integer> entry : laplas.entrySet()) {
+                    System.out.println(entry.getKey() + " - " + entry.getValue());
+                }
 
                 System.out.println("SPEC scores:");
                 SPEC spec = new SPEC(dataset.getInstances(), new EuclideanDistance());
 
-                for (int i = 0; i < dataset.getInstances().numAttributes(); i++)
-                    System.out.println(spec.getFeatureWeight(i));
+                Map<Double, Integer> specMap = new TreeMap<>();
+                for (int i = 0; i < dataset.getInstances().numAttributes(); i++) {
+                    Double val = spec.getFeatureWeight(i);
+                    specMap.put(val, i);
+                    //System.out.println(spec.getFeatureWeight(i));
+                }
 
+                for (Map.Entry<Double, Integer> entry : specMap.entrySet()) {
+                    System.out.println(entry.getKey() + " - " + entry.getValue() );
+                }
 
                 ClustererResult clustererResult = clustererEvaluator.evaluate(dataset.getName(), dataset.getInstances());
 

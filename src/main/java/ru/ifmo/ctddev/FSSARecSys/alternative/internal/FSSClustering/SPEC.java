@@ -158,7 +158,8 @@ public class SPEC {
     }
 
     public Double getFeatureWeight(int featureNum) {
-        // fi = (D^(1/2)f_i / ||D^(1/2)f_i||)^T * (D - W) * (D^(1/2)f_i / ||D^(1/2)f_i||)
+        // fi = (D^(1/2)f_i / ||D^(1/2)f_i||)^T * (D - W) * (D^(1/2)f_i / ||D^(1/2)f_i||) =
+        // = ((f_i)^T * L * (f_i)) / ((f_i)^T * D * (f_i))
 
         DoubleMatrix2D F = DoubleFactory2D.dense.make(numOfInstances, data.numAttributes());
         F.assign(getFeatureMatrix());
@@ -174,14 +175,11 @@ public class SPEC {
 
 
         DoubleMatrix2D D = DoubleFactory2D.sparse.diagonal(d);
-        //DoubleMatrix1D D12feature = alg.mult(D12, F.viewColumn(featureNum));
-
 
         Double numerator = alg.mult(alg.mult(featureTransposed, L).viewRow(0), F.viewColumn(featureNum));
         Double denominator = alg.mult(alg.mult(D, F.viewColumn(featureNum)), F.viewColumn(featureNum));
 
 
         return numerator / denominator;
-
     }
 }
