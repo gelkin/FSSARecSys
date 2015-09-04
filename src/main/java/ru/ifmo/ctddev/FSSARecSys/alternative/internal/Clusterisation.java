@@ -84,26 +84,21 @@ public class Clusterisation {
 
         //get min intra-cluster distance
 
-        boolean [][] intraClusterMatrix = new boolean[numOfClusters][numOfClusters];
-
         Double minIntraclusterDistance = Double.MAX_VALUE;
         Double minLocalDistance = Double.MAX_VALUE;
         for (int i = 0; i < numOfClusters - 1; i++) {
             for (int j = i; j < numOfClusters; j++) {
-                //if (intraClusterMatrix[j][i] == false) {
-                //    intraClusterMatrix[i][j] = true;
-                    Instances clusterI = clusters.get(i);
-                    Instances clusterJ = clusters.get(j);
+                Instances clusterI = clusters.get(i);
+                Instances clusterJ = clusters.get(j);
 
-                    minLocalDistance = Double.MAX_VALUE;
-                    for (int k = 0; k < clusterI.numInstances(); k++) {
-                        for (int p = 0; p < clusterJ.numInstances(); p++) {
-                            Instance first = clusterI.instance(k);
-                            Instance second = clusterJ.instance(p);
-                            minLocalDistance = Double.min(minLocalDistance, allInstancedDist.distance(first, second));
-                        }
+                minLocalDistance = Double.MAX_VALUE;
+                for (int k = 0; k < clusterI.numInstances(); k++) {
+                    for (int p = 0; p < clusterJ.numInstances(); p++) {
+                        Instance first = clusterI.instance(k);
+                        Instance second = clusterJ.instance(p);
+                        minLocalDistance = Double.min(minLocalDistance, allInstancedDist.distance(first, second));
                     }
-                //}
+                }
             }
             minIntraclusterDistance = Double.min(minIntraclusterDistance, minLocalDistance);
         }
