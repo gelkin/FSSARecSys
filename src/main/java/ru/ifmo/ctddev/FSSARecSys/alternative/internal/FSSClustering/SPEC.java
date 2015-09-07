@@ -12,7 +12,7 @@ import weka.core.Instances;
 /**
  * Created by Администратор on 04.09.2015.
  */
-public class SPEC {
+public class SPEC extends FSSClusteringAlgorithm{
 
     /**
      * Customised SPEC algorithm
@@ -52,6 +52,7 @@ public class SPEC {
 
 
     public SPEC(Instances instances, DistanceFunction df) {
+        setName("SPEC score");
         this.data = new Instances(instances);
         this.distanceFunction = df;
         df.setInstances(data);

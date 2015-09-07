@@ -15,6 +15,6 @@ public class ClustererResult {
     }
 
     public Double countSquareDistance(){
-        return Math.sqrt(Math.pow((1 / DBIndex), 2.0) + Math.pow(DunnIndex, 2.0) + Math.pow((1 / SilhouetteIndex), 2.0));
+        return Math.sqrt(Math.pow(DBIndex, 2.0) + Math.pow((1 / DunnIndex), 2.0) + Math.pow((1 / SilhouetteIndex), 2.0));
     }
 }

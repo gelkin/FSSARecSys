@@ -5,6 +5,7 @@ import cern.colt.map.OpenIntDoubleHashMap;
 import ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.classification.*;
 import ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.clustering.ClustererEvaluator;
 import ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.clustering.ClustererResult;
+import ru.ifmo.ctddev.FSSARecSys.alternative.internal.FSSClustering.FSSClusteringAlgorithm;
 import ru.ifmo.ctddev.FSSARecSys.alternative.internal.FSSClustering.LaplasianScore;
 import ru.ifmo.ctddev.FSSARecSys.alternative.internal.FSSClustering.SPEC;
 import ru.ifmo.ctddev.FSSARecSys.db.internal.*;
@@ -12,6 +13,8 @@ import ru.ifmo.ctddev.FSSARecSys.db.manager.*;
 import weka.clusterers.*;
 import weka.core.EuclideanDistance;
 import weka.core.Instances;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Remove;
 
 import java.io.File;
 import java.util.*;
@@ -58,40 +61,15 @@ public class Evaluator {
 
                 Clusterer as = AbstractClusterer.forName(mlAlgorithm.getClassPath(), weka.core.Utils.splitOptions(mlAlgorithm.getOptions()));
                 ClustererEvaluator clustererEvaluator = new ClustererEvaluator(mlAlgorithm.getName(), as);
+                ClustererResult clustererResult = clustererEvaluator.evaluate(dataset.getName(), dataset.getInstances());
 
                 /*todo: add fss-shit for clustering (orly?)*/
-                //SpectralClusterer sp = new SpectralClusterer();
+                getEvaluation(dataset, clustererEvaluator, new LaplasianScore(dataset.getInstances(), new EuclideanDistance()));
+                System.out.println();
+                System.out.println("==================================================");
+                System.out.println();
+                getEvaluation(dataset, clustererEvaluator, new SPEC(dataset.getInstances(), new EuclideanDistance()));
 
-                //DoubleMatrix2D d = DoubleFactory2D.dense.make(3864025, 3864025);
-                System.out.println("Laplasian scores:");
-                LaplasianScore laplasianScore = new LaplasianScore(dataset.getInstances(), new EuclideanDistance());
-
-                Map<Double, Integer> laplas = new TreeMap<>();
-                for (int i = 0; i < dataset.getInstances().numAttributes(); i++) {
-                    Double val = laplasianScore.getFeatureWeight(i);
-                    //System.out.println(val);
-                    laplas.put(val, i);
-                }
-
-                for (Map.Entry<Double, Integer> entry : laplas.entrySet()) {
-                    System.out.println(entry.getKey() + " - " + entry.getValue());
-                }
-
-                System.out.println("SPEC scores:");
-                SPEC spec = new SPEC(dataset.getInstances(), new EuclideanDistance());
-
-                Map<Double, Integer> specMap = new TreeMap<>();
-                for (int i = 0; i < dataset.getInstances().numAttributes(); i++) {
-                    Double val = spec.getFeatureWeight(i);
-                    specMap.put(val, i);
-                    //System.out.println(spec.getFeatureWeight(i));
-                }
-
-                for (Map.Entry<Double, Integer> entry : specMap.entrySet()) {
-                    System.out.println(entry.getKey() + " - " + entry.getValue() );
-                }
-
-                ClustererResult clustererResult = clustererEvaluator.evaluate(dataset.getName(), dataset.getInstances());
 
                 return clustererResult.countSquareDistance();
 
@@ -99,9 +77,54 @@ public class Evaluator {
         return null;
     }
 
+    private void getEvaluation(Dataset dataset, ClustererEvaluator clustererEvaluator, FSSClusteringAlgorithm fssClusteringAlgorithm) throws Exception {
+        System.out.println(fssClusteringAlgorithm.getName());
+        //LaplasianScore laplasianScore = new LaplasianScore(dataset.getInstances(), new EuclideanDistance());
+
+        Map<Double, Integer> weightedFeatures = new TreeMap<>();
+        for (int i = 0; i < dataset.getInstances().numAttributes(); i++) {
+            Double val = fssClusteringAlgorithm.getFeatureWeight(i);
+            //System.out.println(val);
+            weightedFeatures.put(val, i);
+        }
+
+        for (Map.Entry<Double, Integer> entry : weightedFeatures.entrySet()) {
+            System.out.println(entry.getKey() + " -> " + entry.getValue());
+        }
+
+        ClustererResult clustererResult = clustererEvaluator.evaluate(dataset.getName(), dataset.getInstances());
+        List<Integer> selectedFeatures = new ArrayList<>(weightedFeatures.values());
+
+        for (int i = 1; i < selectedFeatures.size(); i++) {
+            Instances localTest;
+
+            //sets the array of features to be selected from in the dataset
+            int numRemFeatures = i + 1;
+            int [] deletedFeaturesArray = new int[numRemFeatures];
+
+            for (int j = 0; j < numRemFeatures; j++) {
+                deletedFeaturesArray[j] = selectedFeatures.get(j);
+            }
+
+            //Removal filter
+            Remove rem = new Remove();
+            rem.setAttributeIndicesArray(deletedFeaturesArray);
+            rem.setInvertSelection(true);
+            rem.setInputFormat(dataset.getInstances());
+            localTest = Filter.useFilter(dataset.getInstances(), rem);
+
+            clustererResult = clustererEvaluator.evaluate(dataset.getName(), localTest);
+            System.out.print("first " + (i + 1) + " features: ");
+            for (int j = 0; j < numRemFeatures; j++)
+                System.out.print(deletedFeaturesArray[j] + ", ");
+            System.out.println("");
+            System.out.println(clustererResult.countSquareDistance());
+        }
+    }
+
     public static void main(String [] args)
     {
-        File f = new File("car.arff");
+        File f = new File("abalone.arff");
         Dataset dataset = new Dataset("car", f, "clusterisation");
 
         MLAlgorithm ml = new MLAlgorithm("first_blood", "weka.clusterers.SimpleKMeans", "", "clusterisation");

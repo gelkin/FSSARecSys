@@ -18,7 +18,7 @@ import java.util.function.Function;
 /**
  * Created by Администратор on 31.08.2015.
  */
-public class LaplasianScore {
+public class LaplasianScore extends FSSClusteringAlgorithm{
 
     /**
      * Laplasian score
@@ -53,6 +53,7 @@ public class LaplasianScore {
     private DoubleMatrix1D d_1_2;
 
     public LaplasianScore(Instances instances, DistanceFunction df) {
+        setName("Laplasian score");
         this.data = new Instances(instances);
         this.distanceFunction = df;
         df.setInstances(data);
