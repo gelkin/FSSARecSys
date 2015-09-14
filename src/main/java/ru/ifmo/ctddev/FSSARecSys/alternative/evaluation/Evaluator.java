@@ -1,7 +1,5 @@
 package ru.ifmo.ctddev.FSSARecSys.alternative.evaluation;
 
-import cern.colt.map.AbstractIntDoubleMap;
-import cern.colt.map.OpenIntDoubleHashMap;
 import ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.classification.*;
 import ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.clustering.ClustererEvaluator;
 import ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.clustering.ClustererResult;
@@ -15,9 +13,11 @@ import weka.core.EuclideanDistance;
 import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
+import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Created by Сергей on 03.08.2015.
@@ -44,6 +44,18 @@ public class Evaluator {
         this.betta = betta;
     }
 
+    public static <K, V extends Comparable<? super V>> Map<K, V>
+    sortByValue( Map<K, V> map )
+    {
+        Map<K,V> result = new LinkedHashMap<>();
+        Stream<Map.Entry<K,V>> st = map.entrySet().stream();
+
+        st.sorted(Comparator.comparing(e -> e.getValue()))
+                .forEach(e ->result.put(e.getKey(),e.getValue()));
+
+        return result;
+    }
+
     public Double evaluate(FSSAlgorithm fssAlgorithm, Dataset dataset, MLAlgorithm mlAlgorithm) throws Exception {
         switch (dataset.getTaskType()){
             case "classification":
@@ -59,11 +71,14 @@ public class Evaluator {
 //                    queryManager.addDataset(dataset);
 //                }
 
+                //dataset.getInstances().
+
                 Clusterer as = AbstractClusterer.forName(mlAlgorithm.getClassPath(), weka.core.Utils.splitOptions(mlAlgorithm.getOptions()));
                 ClustererEvaluator clustererEvaluator = new ClustererEvaluator(mlAlgorithm.getName(), as);
                 ClustererResult clustererResult = clustererEvaluator.evaluate(dataset.getName(), dataset.getInstances());
 
                 /*todo: add fss-shit for clustering (orly?)*/
+
                 getEvaluation(dataset, clustererEvaluator, new LaplasianScore(dataset.getInstances(), new EuclideanDistance()));
                 System.out.println();
                 System.out.println("==================================================");
@@ -81,19 +96,32 @@ public class Evaluator {
         System.out.println(fssClusteringAlgorithm.getName());
         //LaplasianScore laplasianScore = new LaplasianScore(dataset.getInstances(), new EuclideanDistance());
 
-        Map<Double, Integer> weightedFeatures = new TreeMap<>();
+//        Map<Double, Integer> weightedFeatures = new TreeMap<>();
+//        for (int i = 0; i < dataset.getInstances().numAttributes(); i++) {
+//            Double val = fssClusteringAlgorithm.getFeatureWeight(i);
+//            //System.out.println(val);
+//            weightedFeatures.put(val, i);
+//        }
+
+        Map<Integer, Double> weightedFeatures = new TreeMap<>();
         for (int i = 0; i < dataset.getInstances().numAttributes(); i++) {
             Double val = fssClusteringAlgorithm.getFeatureWeight(i);
             //System.out.println(val);
-            weightedFeatures.put(val, i);
+            weightedFeatures.put(i, val);
         }
 
-        for (Map.Entry<Double, Integer> entry : weightedFeatures.entrySet()) {
+        weightedFeatures = sortByValue(weightedFeatures);
+
+        for (Map.Entry<Integer, Double> entry : weightedFeatures.entrySet()) {
             System.out.println(entry.getKey() + " -> " + entry.getValue());
         }
 
+//        for (Map.Entry<Double, Integer> entry : weightedFeatures.entrySet()) {
+//            System.out.println(entry.getKey() + " -> " + entry.getValue());
+//        }
+
         ClustererResult clustererResult = clustererEvaluator.evaluate(dataset.getName(), dataset.getInstances());
-        List<Integer> selectedFeatures = new ArrayList<>(weightedFeatures.values());
+        List<Integer> selectedFeatures = new ArrayList<>(weightedFeatures.keySet());
 
         for (int i = 1; i < selectedFeatures.size(); i++) {
             Instances localTest;
@@ -124,8 +152,12 @@ public class Evaluator {
 
     public static void main(String [] args)
     {
-        File f = new File("abalone.arff");
+        File f = new File("wcd.arff");
         Dataset dataset = new Dataset("car", f, "clusterisation");
+//        Instances tmp = dataset.getInstances();
+//        tmp.deleteStringAttributes();
+//        dataset.
+
 
         MLAlgorithm ml = new MLAlgorithm("first_blood", "weka.clusterers.SimpleKMeans", "", "clusterisation");
 
