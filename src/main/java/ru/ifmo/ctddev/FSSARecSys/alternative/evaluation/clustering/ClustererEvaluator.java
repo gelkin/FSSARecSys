@@ -59,6 +59,12 @@ public class ClustererEvaluator {
             }
 
             Clusterisation clusterisation = new Clusterisation(clusters, clusterer);
+            System.out.println("Davies-Bouldin: " + clusterisation.DaviesBouldinIndex());
+            System.out.println("Dunn index: " + clusterisation.DunnIndex());
+            System.out.println("Silhouette: " + clusterisation.silhouetteIndex());
+            System.out.println("Calinski-Harabasz: " + clusterisation.CalinskiHarabaszIndex());
+            System.out.println("SDbw: " + clusterisation.SDbw());
+            System.out.println("Score func: " + clusterisation.ScoreFunction());
 
             return new ClustererResult(clusterisation.DaviesBouldinIndex(), clusterisation.DunnIndex(), clusterisation.silhouetteIndex());
 

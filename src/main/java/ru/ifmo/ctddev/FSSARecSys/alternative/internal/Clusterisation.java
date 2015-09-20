@@ -6,6 +6,7 @@ import weka.core.EuclideanDistance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.clusterers.Clusterer;
+import weka.core.matrix.Matrix;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -44,6 +45,11 @@ public class Clusterisation {
             ClusterCentroid ct = new ClusterCentroid();
             return ct.findCentroid(clusterNum, clusters.get(clusterNum));
         }
+    }
+
+    public Instance getDatasetCentroid(){
+        ClusterCentroid ct = new ClusterCentroid();
+        return ct.findCentroid(0, unitedClusters);
     }
 
     private Instances getAllInstances(){
@@ -211,6 +217,199 @@ public class Clusterisation {
         }
 
         return result / numOfClusters;
+    }
+
+    // ** Calinski-Harabasz index **
+
+    public Double CalinskiHarabaszIndex(){
+        Double numerator = 0.0;
+
+        Instance datasetCentroid = getDatasetCentroid();
+        Instances centroidsCpy = new Instances(centroids);
+        centroidsCpy.add(datasetCentroid);
+
+        EuclideanDistance e = new EuclideanDistance(centroidsCpy);
+
+        Double sum = 0.0;
+        for (int i = 0; i < numOfClusters; i++) {
+            sum += clusters.get(i).numInstances() * Math.pow(e.distance(centroidsCpy.instance(i), centroidsCpy.lastInstance()), 2.0);
+        }
+        numerator = (unitedClusters.numInstances() - numOfClusters) * sum;
+
+        Double denominator = 0.0;
+
+        sum = 0.0;
+        for (int i = 0; i < numOfClusters; i++) {
+            Instances currCluster = clusters.get(i);
+            currCluster.add(centroids.instance(i));
+            EuclideanDistance ecl = new EuclideanDistance(currCluster);
+            for (int j = 0; j < currCluster.numInstances() - 1; j++) {
+                sum += Math.pow(ecl.distance(currCluster.instance(j), currCluster.lastInstance()), 2.0);
+            }
+        }
+        denominator = sum * (numOfClusters - 1);
+        return numerator / denominator;
+    }
+
+    // ** Score function **
+
+    private Double bcd(){
+        Instance datasetCentroid = getDatasetCentroid();
+        Instances centroidsCpy = new Instances(centroids);
+        centroidsCpy.add(datasetCentroid);
+
+        EuclideanDistance e = new EuclideanDistance(centroidsCpy);
+
+        Double sum = 0.0;
+        for (int i = 0; i < numOfClusters; i++) {
+            sum += clusters.get(i).numInstances() * e.distance(centroidsCpy.instance(i), centroidsCpy.lastInstance());
+        }
+
+        return sum / (numOfClusters * unitedClusters.numInstances());
+
+    }
+
+    private Double wcd(){
+        Double result = 0.0;
+        for (int i = 0; i < numOfClusters; i++) {
+            Double sum = 0.0;
+            Instances currCluster = clusters.get(i);
+            currCluster.add(centroids.instance(i));
+            EuclideanDistance ecl = new EuclideanDistance(currCluster);
+            for (int j = 0; j < currCluster.numInstances() - 1; j++) {
+                sum += ecl.distance(currCluster.instance(j), currCluster.lastInstance());
+            }
+            result += (1 / clusters.get(i).numInstances()) * sum;
+        }
+        return result;
+    }
+
+    public Double ScoreFunction(){
+        return Math.exp(Math.exp(bcd() + wcd()));
+    }
+
+    // ** S_Dbw **
+
+    private Double normedSigma(Instances x, int clusterNum) throws Exception {
+        Instance centroid = new Instance(centroids.numAttributes());
+        if (clusterNum == -1) {
+            centroid = getDatasetCentroid();
+        } else {
+            centroid = getClusterCentroid(clusterNum);
+        }
+
+        double [] centroidArr = centroid.toDoubleArray();
+
+        Instances copyX = new Instances(x);
+        copyX.add(centroid);
+        EuclideanDistance e = new EuclideanDistance(copyX);
+
+        double [] sum = new double[centroidArr.length];
+        for (int i = 0; i < x.numInstances(); i++) {
+            Instance current = x.instance(i);
+            double [] currArr = current.toDoubleArray();
+
+            for (int j = 0; j < sum.length; j++) {
+                if (x.attribute(j).isNumeric())
+                    sum[j] += Math.pow(currArr[j] - centroidArr[j], 2.0);
+                else {
+                    if (x.attribute(j).isNominal()) {
+                        sum[j] = currArr[j] == centroidArr[j] ? 0 : 1;
+                    }
+                }
+            }
+        }
+        Double norm = 0.0;
+        for (int i = 0; i < sum.length; i++) {
+            norm += Math.pow(sum[i], 2.0);
+        }
+        norm = Math.sqrt(norm);
+        int clusterSize = x.numInstances();
+
+        return (norm / clusterSize);
+    }
+
+    private Double stdev() throws Exception {
+        Double result = 0.0;
+        for (int i = 0; i < numOfClusters; i++) {
+            result += normedSigma(clusters.get(i), i);
+        }
+        return (1 / numOfClusters) * Math.sqrt(result);
+    }
+
+    private Double func(Instance a, Instance b, Double stdevVal){
+        Instances x = new Instances(centroids, 0);
+        x.add(a);
+        x.add(b);
+        EuclideanDistance e = new EuclideanDistance(x);
+        return e.distance(a, b) > stdevVal? 0.0 : 1.0;
+    }
+
+    private Double den1(int clusterNum, Double stdevVal) throws Exception {
+        Instances cluster = clusters.get(clusterNum);
+        Instance centroid = centroids.instance(clusterNum);
+
+        Double result = 0.0;
+        for (int i = 0; i < cluster.numInstances(); i++){
+            Instance curr = cluster.instance(i);
+            result += func(centroid, curr, stdevVal);
+        }
+        return result;
+    }
+
+    private Double den2(int clusterNum1, int clusterNum2, Double stdevVal) {
+        Instances cluster1 = clusters.get(clusterNum1);
+        Instances cluster2 = clusters.get(clusterNum2);
+
+        Instances union = new Instances(cluster1);
+        for (int i = 0; i < cluster2.numInstances(); i++) {
+            union.add(cluster2.instance(i));
+        }
+
+        Instance centroid1 = centroids.instance(clusterNum1);
+        Instance centroid2 = centroids.instance(clusterNum2);
+
+        double [] meanCentrArr = new double[centroids.numAttributes()];
+        double [] centr1 = centroid1.toDoubleArray();
+        double [] centr2 = centroid2.toDoubleArray();
+
+        for (int i = 0; i < meanCentrArr.length; i++) {
+            meanCentrArr[i] = (centr1[i] + centr2[i]) / 2;
+        }
+
+        Instance meanCentroid = new Instance(1.0, meanCentrArr);
+
+        Double result = 0.0;
+        for (int i = 0; i < union.numInstances(); i++){
+            Instance curr = union.instance(i);
+            result += func(meanCentroid, curr, stdevVal);
+        }
+        return result;
+
+    }
+
+    public Double SDbw() throws Exception {
+        Double scat = 0.0;
+        Double nsTotal = normedSigma(unitedClusters, -1);
+
+        for (int i = 0; i < numOfClusters; i++) {
+            Double nsCurr = normedSigma(clusters.get(i), i);
+            scat += nsCurr / nsTotal;
+        }
+
+        scat /= numOfClusters;
+
+        Double stdDevVal = stdev();
+        Double dens = 0.0;
+
+        for (int i = 0; i < numOfClusters - 1; i++) {
+            for (int j = i; j < numOfClusters; j++) {
+                dens += den2(i, j, stdDevVal) / Math.max(den1(i, stdDevVal), den1(j, stdDevVal));
+            }
+        }
+        dens /= numOfClusters * (numOfClusters - 1);
+
+        return scat + dens;
     }
 
 }
