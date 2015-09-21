@@ -152,7 +152,7 @@ public class Evaluator {
 
     public static void main(String [] args)
     {
-        File f = new File("wcd.arff");
+        File f = new File("simple.arff");
         Dataset dataset = new Dataset("car", f, "clusterisation");
 //        Instances tmp = dataset.getInstances();
 //        tmp.deleteStringAttributes();
