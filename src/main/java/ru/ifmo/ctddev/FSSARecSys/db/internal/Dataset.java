@@ -8,6 +8,8 @@ import ru.ifmo.ctddev.FSSARecSys.utils.MetaFeaturesVector;
 import weka.core.Instances;
 import weka.core.converters.ArffLoader;
 import weka.core.converters.ConverterUtils;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Normalize;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +36,14 @@ public class Dataset implements DataSet{
     public Instances getInstances() {
         try {
             ConverterUtils.DataSource dataSource = new ConverterUtils.DataSource(file.getPath());
-            return dataSource.getDataSet();
+
+            Instances instances = dataSource.getDataSet();
+
+//            Filter filter = new Normalize();
+//            filter.setInputFormat(instances);
+//            instances = Filter.useFilter(instances, filter);
+
+            return instances;
         } catch (Exception e) {
             e.printStackTrace();
         }

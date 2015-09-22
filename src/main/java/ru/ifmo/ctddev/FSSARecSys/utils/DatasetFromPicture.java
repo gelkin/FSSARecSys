@@ -29,7 +29,9 @@ public class DatasetFromPicture {
 
     public static void main(String[] args) throws IOException {
 
-        File sourceimage = new File("simple.jpg");
+        String name = "center";
+
+        File sourceimage = new File(name + ".jpg");
         image = ImageIO.read(sourceimage);
 
         List<Pair<Integer, Integer>> result = new ArrayList<>();
@@ -43,7 +45,7 @@ public class DatasetFromPicture {
                     result.add(new Pair<>(i, j));
                 }
             }
-        PrintWriter writer = new PrintWriter("simple.csv", "UTF-8");
+        PrintWriter writer = new PrintWriter(name + ".csv", "UTF-8");
         writer.println("x,y");
         for (Pair<Integer, Integer> p : result)
         writer.println(p.first + "," + p.second);
