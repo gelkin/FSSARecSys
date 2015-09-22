@@ -118,6 +118,9 @@ public class TestMetrics {
         File centerFile = new File("center.arff");
         fileSet.add(centerFile);
 
+        File linkedFile = new File("linked.arff");
+        fileSet.add(linkedFile);
+
         //** add more files for different structures
 
         for (File fs: fileSet)
