@@ -62,6 +62,9 @@ public class Clusterisation {
         return all;
     }
 
+    //** all the formulars are in An extensive comparative study of cluster validity indices
+    //Olatz Arbelaitz, Ibai Gurrutxagan, Javier Muguerza,Jesus M.Perez, Inigo Perona
+
     // ** Dunn's index **
 
     public Double DunnIndex(){
@@ -410,6 +413,51 @@ public class Clusterisation {
         dens /= numOfClusters * (numOfClusters - 1);
 
         return scat + dens;
+    }
+
+    //** CS-index **
+
+    public Double CS() throws Exception {
+
+        Double numerator = 0.0;
+
+        for (int i = 0; i < numOfClusters; i++) {
+            Instances currCluster = clusters.get(i);
+            int currSize = currCluster.numInstances();
+            EuclideanDistance e = new EuclideanDistance(currCluster);
+            Double maxDist = Double.NEGATIVE_INFINITY;
+            Double sum = 0.0;
+            for (int j = 0; j < currSize - 1; j++) {
+                for (int k = j; k < currSize; k++) {
+                    Instance first = currCluster.instance(j);
+                    Instance second = currCluster.instance(k);
+                    maxDist = Double.max(maxDist, e.distance(first, second));
+                }
+                sum += maxDist;
+            }
+            sum /= currSize;
+            numerator += sum;
+        }
+
+        Double denominator = 0.0;
+
+        EuclideanDistance eCent = new EuclideanDistance(centroids);
+        for (int i = 0; i < numOfClusters - 1; i++) {
+            Double minVal = Double.POSITIVE_INFINITY;
+            for (int j = i; j < numOfClusters; j++) {
+                minVal = Double.min(minVal, eCent.distance(centroids.instance(i), centroids.instance(j)));
+            }
+            denominator += minVal;
+        }
+
+        return numerator / denominator;
+    }
+
+
+    // ** COP-index (used mostly for Hierarchical algo) **
+
+    public Double COP(){
+        return null;
     }
 
 }

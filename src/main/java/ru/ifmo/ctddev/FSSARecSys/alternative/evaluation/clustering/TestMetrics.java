@@ -121,6 +121,12 @@ public class TestMetrics {
         File linkedFile = new File("linked.arff");
         fileSet.add(linkedFile);
 
+        File overlapFile = new File("overlap.arff");
+        fileSet.add(overlapFile);
+
+        File sparseFile = new File("sparse.arff");
+        fileSet.add(sparseFile);
+
         //** add more files for different structures
 
         for (File fs: fileSet)
