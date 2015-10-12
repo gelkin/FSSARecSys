@@ -9,6 +9,7 @@ import weka.clusterers.Clusterer;
 import weka.core.matrix.Matrix;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 
 /**
@@ -457,6 +458,227 @@ public class Clusterisation {
     // ** COP-index (used mostly for Hierarchical algo) **
 
     public Double COP(){
+        Double result = 0.0;
+        EuclideanDistance eclAll = new EuclideanDistance(unitedClusters);
+
+        for (int i = 0; i < numOfClusters; i++){
+
+            Double numerator = 0.0;
+
+            Instances currCluster = clusters.get(i);
+            currCluster.add(centroids.instance(i));
+            Double sum = 0.0;
+            EuclideanDistance e = new EuclideanDistance(currCluster);
+            for (int j = 0; j < currCluster.numInstances() - 1; j++) {
+                sum += e.distance(currCluster.instance(j), currCluster.lastInstance());
+            }
+            sum /= (currCluster.numInstances() - 1);
+            currCluster.delete(currCluster.numInstances() - 1);
+            numerator = sum;
+
+            Double denominator = 0.0;
+
+            Double minDist = Double.POSITIVE_INFINITY;
+            for (int j = 0; j < numOfClusters; j++) {
+                if (i != j) {
+                    Instances comparedCluster = clusters.get(j);
+                    for (int k = 0; k < comparedCluster.numInstances(); k++) {
+                        Double maxDist = Double.NEGATIVE_INFINITY;
+                        for (int p = 0; p < currCluster.numInstances(); p++)
+                            maxDist = Double.max(maxDist, eclAll.distance(comparedCluster. instance(k), currCluster.instance(p)));
+                        minDist = Double.min(minDist, maxDist);
+                    }
+                }
+            }
+            denominator = minDist;
+            result += (numerator / denominator) * currCluster.numInstances();
+        }
+        return result / unitedClusters.numInstances();
+    }
+
+    // ** SV-index **
+
+    public Double SV(){
+        Double numerator = 0.0;
+
+        EuclideanDistance e = new EuclideanDistance(centroids);
+
+        Double minCentrDist = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < numOfClusters; i++) {
+            for (int j = i; j < numOfClusters; j++) {
+                minCentrDist = Double.min(minCentrDist, e.distance(centroids.instance(i), centroids.instance(j)));
+            }
+        }
+        numerator = minCentrDist;
+
+        Double denominator = 0.0;
+
+        for (int i = 0; i < numOfClusters; i++){
+            Instances currCluster = clusters.get(i);
+            Double sum = 0.0;
+            //Double maxToCentrDist = Double.NEGATIVE_INFINITY;
+
+            currCluster.add(centroids.instance(i));
+            EuclideanDistance ecl = new EuclideanDistance(currCluster);
+
+            ArrayList<Double> dist = new ArrayList<>();
+            for (int j = 0; j < currCluster.numInstances() - 1; j++) {
+                dist.add(ecl.distance(currCluster.instance(j), currCluster.lastInstance()));
+                //maxToCentrDist = Double.max(maxToCentrDist, ecl.distance(currCluster.instance(j), currCluster.lastInstance()));
+            }
+            currCluster.delete(currCluster.numInstances() - 1);
+            Collections.sort(dist);
+            Collections.reverse(dist);
+
+            for (int j = 0; j < 0.1 * (currCluster.numInstances()); j++){
+                sum += dist.get(j);
+            }
+            sum *= (10 / currCluster.numInstances());
+            denominator += sum;
+        }
+
+        return numerator / denominator;
+    }
+
+    // ** OS-index **
+
+    private Double aOS(int xi, int ck){
+        Instances cluster = clusters.get(ck);
+        EuclideanDistance e = new EuclideanDistance(cluster);
+        Double sum = 0.0;
+        for (int i = 0; i < cluster.numInstances(); i++) {
+            sum += e.distance(cluster.instance(xi), cluster.instance(i));
+        }
+        return sum / cluster.numInstances();
+    }
+
+    private Double bOS(int xi, int ck){
+        Instances cluster = clusters.get(ck);
+        EuclideanDistance e = new EuclideanDistance(unitedClusters);
+
+        Double sum = 0.0;
+        ArrayList<Double> dist = new ArrayList<>();
+        for (int i = 0; i < numOfClusters; i++) {
+            if (i != ck) {
+                Instances currCluster = clusters.get(i);
+                for (int j = 0; j < currCluster.numInstances(); j++) {
+                    dist.add(e.distance(currCluster.instance(j), cluster.instance(xi)));
+                }
+            }
+            Collections.sort(dist);
+            for (int j = 0; j < cluster.numInstances(); j++){
+                sum += dist.get(j);
+            }
+        }
+        return sum /= cluster.numInstances();
+    }
+
+    private Double ovOS(int xi, int ck){
+        Double a = aOS(xi, ck);
+        Double b = bOS(xi, ck);
+        if (((b - a) / (b + a)) < 0.4) {
+            return a / b;
+        } else {
+            return 0.0;
+        }
+    }
+
+    public Double OS(){
+        Double numerator = 0.0;
+
+        for (int i = 0; i < numOfClusters; i++) {
+            Instances currCluster = clusters.get(i);
+            for (int j = 0; j < currCluster.numInstances(); j++) {
+                numerator += ovOS(j, i);
+            }
+        }
+
+        Double denominator = 0.0;
+
+        for (int i = 0; i < numOfClusters; i++){
+            Instances currCluster = clusters.get(i);
+            Double sum = 0.0;
+            //Double maxToCentrDist = Double.NEGATIVE_INFINITY;
+
+            currCluster.add(centroids.instance(i));
+            EuclideanDistance ecl = new EuclideanDistance(currCluster);
+
+            ArrayList<Double> dist = new ArrayList<>();
+            for (int j = 0; j < currCluster.numInstances() - 1; j++) {
+                dist.add(ecl.distance(currCluster.instance(j), currCluster.lastInstance()));
+                //maxToCentrDist = Double.max(maxToCentrDist, ecl.distance(currCluster.instance(j), currCluster.lastInstance()));
+            }
+            currCluster.delete(currCluster.numInstances() - 1);
+            Collections.sort(dist);
+            Collections.reverse(dist);
+
+            for (int j = 0; j < 0.1 * (currCluster.numInstances()); j++){
+                sum += dist.get(j);
+            }
+            sum *= (10 / currCluster.numInstances());
+            denominator += sum;
+        }
+        return numerator / denominator;
+    }
+
+    // ** Sym-index **
+
+    private Instance getSpecialInstance(int xi, int ck){
+        Instance curr = clusters.get(ck).instance(xi);
+        Instance centroid = centroids.instance(ck);
+        int numOfAttributes = curr.numAttributes();
+
+        double [] first = curr.toDoubleArray();
+        double [] second = centroid.toDoubleArray();
+        double [] result = new double[numOfAttributes];
+
+        for (int i = 0; i < numOfAttributes; i++) {
+            result[i] = 2 * second[i] - first[i];
+        }
+        return new Instance(1.0, result);
+    }
+
+    private Double dps(int xi, int ck) {
+        Instances cluster = clusters.get(ck);
+        ArrayList<Double> dist = new ArrayList<>();
+
+        for (int i = 0; i < cluster.numInstances(); i++) {
+            Instance spec = getSpecialInstance(xi, ck);
+            cluster.add(spec);
+            EuclideanDistance e = new EuclideanDistance(cluster);
+            Double distance = e.distance(cluster.instance(i), cluster.lastInstance());
+            cluster.delete(cluster.numInstances() - 1);
+            dist.add(distance);
+        }
+        Collections.sort(dist);
+        return 0.5 * (dist.get(0) + dist.get(1));
+    }
+
+    public Double SymIndex(){
+        Double numerator = 0.0;
+        EuclideanDistance e = new EuclideanDistance(centroids);
+        Double maxCentrDist = Double.NEGATIVE_INFINITY;
+        for (int i = 0; i < numOfClusters; i++)
+            for (int j = 0; j < numOfClusters; j++) {
+                maxCentrDist = Double.max(maxCentrDist, e.distance(centroids.instance(i), centroids.instance(j)));
+            }
+        numerator = maxCentrDist;
+
+        Double denominator = 0.0;
+        for (int i = 0; i < numOfClusters; i++) {
+            Instances currCluster = clusters.get(i);
+            for (int j = 0; j < currCluster.numInstances(); j++) {
+                denominator += dps(j, i);
+            }
+        }
+        denominator *= numOfClusters;
+
+        return numerator / denominator;
+    }
+
+    // ** Gamma index **
+
+    public Double Gamma(){
         return null;
     }
 
