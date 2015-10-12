@@ -97,7 +97,7 @@ public class Clusterisation {
         Double minIntraclusterDistance = Double.MAX_VALUE;
         Double minLocalDistance = Double.MAX_VALUE;
         for (int i = 0; i < numOfClusters - 1; i++) {
-            for (int j = i; j < numOfClusters; j++) {
+            for (int j = i + 1; j < numOfClusters; j++) {
                 Instances clusterI = clusters.get(i);
                 Instances clusterJ = clusters.get(j);
 
@@ -407,7 +407,7 @@ public class Clusterisation {
         Double dens = 0.0;
 
         for (int i = 0; i < numOfClusters - 1; i++) {
-            for (int j = i; j < numOfClusters; j++) {
+            for (int j = i + 1; j < numOfClusters; j++) {
                 dens += den2(i, j, stdDevVal) / Math.max(den1(i, stdDevVal), den1(j, stdDevVal));
             }
         }
@@ -445,7 +445,7 @@ public class Clusterisation {
         EuclideanDistance eCent = new EuclideanDistance(centroids);
         for (int i = 0; i < numOfClusters - 1; i++) {
             Double minVal = Double.POSITIVE_INFINITY;
-            for (int j = i; j < numOfClusters; j++) {
+            for (int j = i + 1; j < numOfClusters; j++) {
                 minVal = Double.min(minVal, eCent.distance(centroids.instance(i), centroids.instance(j)));
             }
             denominator += minVal;
@@ -505,7 +505,7 @@ public class Clusterisation {
 
         Double minCentrDist = Double.POSITIVE_INFINITY;
         for (int i = 0; i < numOfClusters; i++) {
-            for (int j = i; j < numOfClusters; j++) {
+            for (int j = i + 1; j < numOfClusters; j++) {
                 minCentrDist = Double.min(minCentrDist, e.distance(centroids.instance(i), centroids.instance(j)));
             }
         }
@@ -678,7 +678,28 @@ public class Clusterisation {
 
     // ** Gamma index **
 
+    private Double dl(int t1, int t2, int ck) {
+        for (int i = 0; i < numOfClusters - 1; i++) {
+            for (int j = i + 1; j < numOfClusters; j++) {
+
+            }
+        }
+        return null;
+    }
+
     public Double Gamma(){
+        Double numerator = 0.0;
+
+        for (int i = 0; i < numOfClusters; i++) {
+            Instances cluster = clusters.get(i);
+            for (int j = 0; j < cluster.numInstances() - 1; j++) {
+                for (int k = j; k < cluster.numInstances(); k++){
+                    numerator += dl(j, k, i);
+                }
+            }
+        }
+
+        Double denominator = 0.0;
         return null;
     }
 
