@@ -6,7 +6,6 @@ import weka.core.EuclideanDistance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.clusterers.Clusterer;
-import weka.core.matrix.Matrix;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +23,8 @@ public class Clusterisation {
 
     private Integer numOfClusters;
 
+    private Double NW;
+
     //clusterer should be already be built on the whole dataset
     public Clusterisation(ArrayList<Instances> clusters, Clusterer clusterer) {
         this.clusters = clusters;
@@ -33,6 +34,8 @@ public class Clusterisation {
         unitedClusters = getAllInstances();
 
         centroids = new Instances(clusters.get(0), 0);
+
+        NW = nW();
     }
 
     public Integer getNumClusters(){
@@ -74,15 +77,15 @@ public class Clusterisation {
 
         EuclideanDistance allInstancedDist = new EuclideanDistance(unitedClusters);
 
-        Double maxTotal = Double.MIN_VALUE;
+        Double maxTotal = Double.NEGATIVE_INFINITY;
         Double maxForCluster = Double.MIN_VALUE;
         for (int i = 0; i < numOfClusters; i++) {
             Instances currCluster = clusters.get(i);
-            maxTotal = Double.MIN_VALUE;
-            maxForCluster = Double.MIN_VALUE;
+            //maxTotal = Double.NEGATIVE_INFINITY;
+            maxForCluster = Double.NEGATIVE_INFINITY;
             for (int j = 0; j < currCluster.numInstances(); j++) {
                 Instance currInstance = currCluster.instance(j);
-                maxForCluster = Double.MIN_VALUE;
+                maxForCluster = Double.NEGATIVE_INFINITY;
                 for (int k = 0; k < currCluster.numInstances(); k++) {
                     if (j != k)
                         maxForCluster = Double.max(maxForCluster,
@@ -94,14 +97,14 @@ public class Clusterisation {
 
         //get min intra-cluster distance
 
-        Double minIntraclusterDistance = Double.MAX_VALUE;
-        Double minLocalDistance = Double.MAX_VALUE;
+        Double minIntraclusterDistance = Double.POSITIVE_INFINITY;
+        Double minLocalDistance = Double.POSITIVE_INFINITY;
         for (int i = 0; i < numOfClusters - 1; i++) {
             for (int j = i + 1; j < numOfClusters; j++) {
                 Instances clusterI = clusters.get(i);
                 Instances clusterJ = clusters.get(j);
 
-                minLocalDistance = Double.MAX_VALUE;
+                minLocalDistance = Double.POSITIVE_INFINITY;
                 for (int k = 0; k < clusterI.numInstances(); k++) {
                     for (int p = 0; p < clusterJ.numInstances(); p++) {
                         Instance first = clusterI.instance(k);
@@ -124,7 +127,7 @@ public class Clusterisation {
         ArrayList<EuclideanDistance> euclideanDistances = new ArrayList<>(numOfClusters);
 
         for (int i = 0; i < numOfClusters; i++){
-            sTemp.add(Double.MIN_VALUE);
+            sTemp.add(Double.NEGATIVE_INFINITY);
             euclideanDistances.add(new EuclideanDistance());
         }
 
@@ -147,12 +150,12 @@ public class Clusterisation {
 
         ArrayList<Double> dTemp = new ArrayList<>(numOfClusters);
         for (int i = 0; i < numOfClusters; i++){
-            dTemp.add(Double.MIN_VALUE);
+            dTemp.add(Double.NEGATIVE_INFINITY);
         }
 
         EuclideanDistance centroidDist = new EuclideanDistance(centroids);
 
-        Double maxVal = Double.MIN_VALUE;
+        Double maxVal = Double.NEGATIVE_INFINITY;
         for (int i = 0; i < clusters.size(); i++) {
             maxVal = Double.MIN_VALUE;
             for (int j = 0; j < clusters.size(); j++)
@@ -679,12 +682,39 @@ public class Clusterisation {
     // ** Gamma index **
 
     private Double dl(int t1, int t2, int ck) {
+        int result = 0;
+        EuclideanDistance e = new EuclideanDistance(unitedClusters);
+        Instances comparedCluster = clusters.get(ck);
+        Double distance = e.distance(comparedCluster.instance(t1), comparedCluster.instance(t2));
         for (int i = 0; i < numOfClusters - 1; i++) {
             for (int j = i + 1; j < numOfClusters; j++) {
+                if (i != ck && j != ck){
+                    Instances clusterFirst = clusters.get(i);
+                    Instances clusterSecond = clusters.get(j);
 
+                    for (int k = 0; k < clusterFirst.numInstances(); k++)
+                        for (int p = 0; p < clusterSecond.numInstances(); p++)
+                            if (e.distance(clusterFirst.instance(k), clusterSecond.instance(p)) < distance)
+                                result++;
+                }
             }
         }
-        return null;
+        Integer answer = result;
+        return answer.doubleValue();
+    }
+
+    private int fact(int num) {
+        return (num == 0) ? 1 : num * fact(num - 1);
+    }
+
+    private Double nW(){
+        int result = 0;
+        for (int i = 0; i < numOfClusters; i++) {
+            int n = clusters.get(i).numInstances();
+            result += fact(n) / (fact(2) * (fact(n - 2)));
+        }
+        Integer answer = result;
+        return answer.doubleValue();
     }
 
     public Double Gamma(){
@@ -700,7 +730,489 @@ public class Clusterisation {
         }
 
         Double denominator = 0.0;
-        return null;
+
+        int N = unitedClusters.numInstances();
+        Integer tmpN2 = fact(N) / (fact(2) * fact(N - 2));
+        Double N2 = tmpN2.doubleValue();
+
+        denominator = NW * (N2 - NW);
+
+        return numerator / denominator;
     }
+
+    // ** C-index **
+
+    private Double SCI() {
+        Double result = 0.0;
+        for (int i = 0; i < numOfClusters; i++) {
+            Instances cluster = clusters.get(i);
+            EuclideanDistance e = new EuclideanDistance(cluster);
+            int size = cluster.numInstances();
+            for (int j = 0; j < size - 1; j++) {
+                for (int k = j + 1; k < size; k++) {
+                    result += e.distance(cluster.instance(j), cluster.instance(k));
+                }
+            }
+        }
+        return result;
+    }
+
+    private ArrayList<Double> getAllDistances() {
+        ArrayList<Double> dist = new ArrayList<>();
+        EuclideanDistance e = new EuclideanDistance(unitedClusters);
+        for (int i = 0; i < numOfClusters; i++) {
+            for (int j = i; j < numOfClusters; j++) {
+                Instances clusterFirst = clusters.get(i);
+                Instances clusterSecond = clusters.get(j);
+
+                int sizeFirst = clusterFirst.numInstances();
+                int sizeSecond = clusterSecond.numInstances();
+
+                for (int k = 0; k < sizeFirst; k++) {
+                    for (int p = 0; p < sizeSecond; p++) {
+                        dist.add(e.distance(clusterFirst.instance(k), clusterSecond.instance(p)));
+                    }
+                }
+
+            }
+        }
+        return dist;
+    }
+
+    private Double SCIMin(ArrayList<Double> dist){
+        Double result = 0.0;
+        ArrayList<Double> localDist = dist;
+        Collections.sort(localDist);
+        for (int i = 0; i < NW; i++) {
+            result += localDist.get(i);
+        }
+        return result;
+    }
+
+    private Double SCIMax(ArrayList<Double> dist){
+        Double result = 0.0;
+        ArrayList<Double> localDist = dist;
+        Collections.sort(localDist);
+        Collections.reverse(localDist);
+        for (int i = 0; i < NW; i++) {
+            result += localDist.get(i);
+        }
+        return result;
+    }
+
+    public Double CI(){
+        Double S = SCI();
+        ArrayList<Double> dist = getAllDistances();
+
+        Double Smin = SCIMin(dist);
+        Double Smax = SCIMax(dist);
+
+        return (S - Smin) / (Smax - Smin);
+    }
+
+    // ** DB-star **
+
+    public Double DaviesBouldinStarIndex() throws Exception {
+        //count S_i = 1 / |C_i| sum_all_xi(dist(x_i, centr_i))
+
+        ArrayList<Double> sTemp = new ArrayList<>(numOfClusters);
+        ArrayList<EuclideanDistance> euclideanDistances = new ArrayList<>(numOfClusters);
+
+        for (int i = 0; i < numOfClusters; i++){
+            sTemp.add(Double.NEGATIVE_INFINITY);
+            euclideanDistances.add(new EuclideanDistance());
+        }
+
+        for (int i = 0; i < numOfClusters; i++) {
+            Double sumTmp = 0.0;
+            Instances currentCluster = clusters.get(i);
+            euclideanDistances.set(i, new EuclideanDistance(currentCluster));
+
+            Instance centroid = getClusterCentroid(i);
+            centroids.add(centroid);
+
+            for (int j = 0; j < currentCluster.numInstances(); j++){
+                Instance instance = currentCluster.instance(j);
+                sumTmp += euclideanDistances.get(i).distance(instance, centroid);
+            }
+            sTemp.set(i, sumTmp / currentCluster.numInstances());
+        }
+
+        //count D_i = max_j (i!=j) {(S_i + S_j)} / min(i!=j) {dist(centr_i, centr_j)}
+
+        ArrayList<Double> dTemp = new ArrayList<>(numOfClusters);
+        for (int i = 0; i < numOfClusters; i++){
+            dTemp.add(Double.NEGATIVE_INFINITY);
+        }
+
+        EuclideanDistance centroidDist = new EuclideanDistance(centroids);
+
+        Double maxVal = Double.NEGATIVE_INFINITY;
+        Double minVal = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < clusters.size(); i++) {
+            maxVal = Double.NEGATIVE_INFINITY;
+            minVal = Double.POSITIVE_INFINITY;
+            for (int j = 0; j < clusters.size(); j++)
+                if (i != j) {
+                    maxVal = Double.max(maxVal, (sTemp.get(i) + sTemp.get(j)));
+                    minVal = Double.min(minVal, centroidDist.distance(centroids.instance(i), centroids.instance(j)));
+                }
+            dTemp.set(i, maxVal / minVal);
+        }
+        Double result = 0.0;
+
+        for (Double i: dTemp) {
+            result += i;
+        }
+
+        return result / numOfClusters;
+    }
+
+    // ** Sym-DB **
+
+    public Double SymDB() throws Exception {
+        ArrayList<Double> sTemp = new ArrayList<>(numOfClusters);
+        ArrayList<EuclideanDistance> euclideanDistances = new ArrayList<>(numOfClusters);
+
+        //count C_i = (1 / |c_k|) * sum (x in c_k) {dps(x, centr_k)}
+
+        Double tmpSum = 0.0;
+        for (int i = 0; i < numOfClusters; i++) {
+            Instances currCluster = clusters.get(i);
+            for (int j = 0; j < currCluster.numInstances(); j++) {
+                tmpSum += dps(j, i);
+            }
+            sTemp.set(i, tmpSum / currCluster.numInstances());
+        }
+
+        //count D_i = max_j (i!=j) {(S_i + S_j) / dist(centr_i, centr_j)}
+
+        ArrayList<Double> dTemp = new ArrayList<>(numOfClusters);
+        for (int i = 0; i < numOfClusters; i++){
+            dTemp.add(Double.NEGATIVE_INFINITY);
+        }
+
+        EuclideanDistance centroidDist = new EuclideanDistance(centroids);
+
+        Double maxVal = Double.NEGATIVE_INFINITY;
+        Double minVal = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < clusters.size(); i++) {
+            maxVal = Double.NEGATIVE_INFINITY;
+            minVal = Double.POSITIVE_INFINITY;
+            for (int j = 0; j < clusters.size(); j++)
+                if (i != j) {
+                    maxVal = Double.max(maxVal, (sTemp.get(i) + sTemp.get(j)));
+                    minVal = Double.min(minVal, centroidDist.distance(centroids.instance(i), centroids.instance(j)));
+                }
+            dTemp.set(i, maxVal / minVal);
+        }
+        Double result = 0.0;
+
+        for (Double i: dTemp) {
+            result += i;
+        }
+
+        return result / numOfClusters;
+    }
+
+
+    // ** gD31 **
+
+    private Double delta3(int c1, int c2) {
+        Instances cluster1 = clusters.get(c1);
+        Instances cluster2 = clusters.get(c2);
+
+        int size1 = cluster1.numInstances();
+        int size2 = cluster2.numInstances();
+
+        EuclideanDistance allInstancedDist = new EuclideanDistance(unitedClusters);
+        Double result = 0.0;
+        for (int i = 0; i < size1; i++) {
+            for (int j = 0; j < size2; j++) {
+                result += allInstancedDist.distance(cluster1.instance(i), cluster2.instance(j));
+            }
+        }
+        result /= (size1 * size2);
+        return result;
+    }
+
+
+    public Double gD31(){
+
+        //get max inter-cluster distance
+
+        EuclideanDistance allInstancedDist = new EuclideanDistance(unitedClusters);
+
+        Double maxTotal = Double.NEGATIVE_INFINITY;
+        Double maxForCluster = Double.MIN_VALUE;
+        for (int i = 0; i < numOfClusters; i++) {
+            Instances currCluster = clusters.get(i);
+            //maxTotal = Double.NEGATIVE_INFINITY;
+            maxForCluster = Double.NEGATIVE_INFINITY;
+            for (int j = 0; j < currCluster.numInstances(); j++) {
+                Instance currInstance = currCluster.instance(j);
+                maxForCluster = Double.NEGATIVE_INFINITY;
+                for (int k = 0; k < currCluster.numInstances(); k++) {
+                    if (j != k)
+                        maxForCluster = Double.max(maxForCluster,
+                                allInstancedDist.distance(currInstance, currCluster.instance(k)));
+                }
+            }
+            maxTotal = Double.max(maxTotal, maxForCluster);
+        }
+
+        //get min intra-cluster distance
+
+        Double minIntraclusterDistance = Double.POSITIVE_INFINITY;
+        Double minLocalDistance = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < numOfClusters - 1; i++) {
+            minLocalDistance = Double.POSITIVE_INFINITY;
+            for (int j = i + 1; j < numOfClusters; j++) {
+                minLocalDistance = Double.min(minLocalDistance, delta3(i, j));
+            }
+            minIntraclusterDistance = Double.min(minIntraclusterDistance, minLocalDistance);
+        }
+
+        return minIntraclusterDistance / maxTotal;
+    }
+
+    // ** gD41 **
+
+    public Double gD41(){
+
+        //get max inter-cluster distance
+
+        EuclideanDistance allInstancedDist = new EuclideanDistance(unitedClusters);
+
+        Double maxTotal = Double.NEGATIVE_INFINITY;
+        Double maxForCluster = Double.MIN_VALUE;
+        for (int i = 0; i < numOfClusters; i++) {
+            Instances currCluster = clusters.get(i);
+            //maxTotal = Double.NEGATIVE_INFINITY;
+            maxForCluster = Double.NEGATIVE_INFINITY;
+            for (int j = 0; j < currCluster.numInstances(); j++) {
+                Instance currInstance = currCluster.instance(j);
+                maxForCluster = Double.NEGATIVE_INFINITY;
+                for (int k = 0; k < currCluster.numInstances(); k++) {
+                    if (j != k)
+                        maxForCluster = Double.max(maxForCluster,
+                                allInstancedDist.distance(currInstance, currCluster.instance(k)));
+                }
+            }
+            maxTotal = Double.max(maxTotal, maxForCluster);
+        }
+
+        //get min intra-cluster distance
+
+        Double minIntraclusterDistance = Double.POSITIVE_INFINITY;
+        Double minLocalDistance = Double.POSITIVE_INFINITY;
+        EuclideanDistance e = new EuclideanDistance(centroids);
+
+        for (int i = 0; i < numOfClusters - 1; i++) {
+            minLocalDistance = Double.POSITIVE_INFINITY;
+            for (int j = i + 1; j < numOfClusters; j++) {
+                minLocalDistance = Double.min(minLocalDistance, e.distance(centroids.instance(i), centroids.instance(j)));
+            }
+            minIntraclusterDistance = Double.min(minIntraclusterDistance, minLocalDistance);
+        }
+
+        return minIntraclusterDistance / maxTotal;
+    }
+
+    // ** gD51 **
+
+    private Double delta5(int c1, int c2) {
+        Double result;
+        Instances cluster1 = clusters.get(c1);
+        Instances cluster2 = clusters.get(c2);
+
+        int size1 = cluster1.numInstances();
+        int size2 = cluster2.numInstances();
+
+        cluster1.add(centroids.instance(c1));
+        cluster2.add(centroids.instance(c2));
+
+        EuclideanDistance d1 = new EuclideanDistance(cluster1);
+        EuclideanDistance d2 = new EuclideanDistance(cluster2);
+
+        Double sum1 = 0.0;
+        for (int i = 0; i < size1; i++) {
+            sum1 += d1.distance(cluster1.instance(i), cluster1.lastInstance());
+        }
+
+        Double sum2 = 0.0;
+        for (int i = 0; i < size2; i++) {
+            sum2 += d2.distance(cluster2.instance(i), cluster2.lastInstance());
+        }
+
+        cluster1.delete(cluster1.numInstances() - 1);
+        cluster2.delete(cluster2.numInstances() - 1);
+        
+        result = (sum1 + sum2) / (size1 + size2);
+
+        return result;
+    }
+
+    public Double gD51(){
+
+        //get max inter-cluster distance
+
+        EuclideanDistance allInstancedDist = new EuclideanDistance(unitedClusters);
+
+        Double maxTotal = Double.NEGATIVE_INFINITY;
+        Double maxForCluster = Double.MIN_VALUE;
+        for (int i = 0; i < numOfClusters; i++) {
+            Instances currCluster = clusters.get(i);
+            //maxTotal = Double.NEGATIVE_INFINITY;
+            maxForCluster = Double.NEGATIVE_INFINITY;
+            for (int j = 0; j < currCluster.numInstances(); j++) {
+                Instance currInstance = currCluster.instance(j);
+                maxForCluster = Double.NEGATIVE_INFINITY;
+                for (int k = 0; k < currCluster.numInstances(); k++) {
+                    if (j != k)
+                        maxForCluster = Double.max(maxForCluster,
+                                allInstancedDist.distance(currInstance, currCluster.instance(k)));
+                }
+            }
+            maxTotal = Double.max(maxTotal, maxForCluster);
+        }
+
+        //get min intra-cluster distance
+
+        Double minIntraclusterDistance = Double.POSITIVE_INFINITY;
+        Double minLocalDistance = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < numOfClusters - 1; i++) {
+            minLocalDistance = Double.POSITIVE_INFINITY;
+            for (int j = i + 1; j < numOfClusters; j++) {
+                minLocalDistance = Double.min(minLocalDistance, delta5(i, j));
+            }
+            minIntraclusterDistance = Double.min(minIntraclusterDistance, minLocalDistance);
+        }
+
+        return minIntraclusterDistance / maxTotal;
+    }
+
+    // ** gD33 **
+
+    public Double gD33(){
+
+        //get max inter-cluster distance
+
+        Double maxTotal = Double.NEGATIVE_INFINITY;
+        Double maxForCluster = Double.MIN_VALUE;
+        for (int i = 0; i < numOfClusters; i++) {
+            Instances currCluster = clusters.get(i);
+            Double result;
+
+            int size1 = currCluster.numInstances();
+            currCluster.add(centroids.instance(i));
+            EuclideanDistance d1 = new EuclideanDistance(currCluster);
+            Double sumTmp = 0.0;
+            for (int j = 0; j < size1; j++) {
+                sumTmp += d1.distance(currCluster.instance(i), currCluster.lastInstance());
+            }
+            currCluster.delete(currCluster.numInstances() - 1);
+
+            sumTmp *= (2 / size1);
+            maxTotal = Double.max(maxTotal, sumTmp);
+        }
+
+        //get min intra-cluster distance
+
+        Double minIntraclusterDistance = Double.POSITIVE_INFINITY;
+        Double minLocalDistance = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < numOfClusters - 1; i++) {
+            minLocalDistance = Double.POSITIVE_INFINITY;
+            for (int j = i + 1; j < numOfClusters; j++) {
+                minLocalDistance = Double.min(minLocalDistance, delta3(i, j));
+            }
+            minIntraclusterDistance = Double.min(minIntraclusterDistance, minLocalDistance);
+        }
+
+        return minIntraclusterDistance / maxTotal;
+    }
+
+    // ** gD43 **
+
+    public Double gD43(){
+
+        //get max inter-cluster distance
+
+        Double maxTotal = Double.NEGATIVE_INFINITY;
+        Double maxForCluster = Double.MIN_VALUE;
+        for (int i = 0; i < numOfClusters; i++) {
+            Instances currCluster = clusters.get(i);
+            Double result;
+
+            int size1 = currCluster.numInstances();
+            currCluster.add(centroids.instance(i));
+            EuclideanDistance d1 = new EuclideanDistance(currCluster);
+            Double sumTmp = 0.0;
+            for (int j = 0; j < size1; j++) {
+                sumTmp += d1.distance(currCluster.instance(i), currCluster.lastInstance());
+            }
+            currCluster.delete(currCluster.numInstances() - 1);
+
+            sumTmp *= (2 / size1);
+            maxTotal = Double.max(maxTotal, sumTmp);
+        }
+
+        //get min intra-cluster distance
+
+        Double minIntraclusterDistance = Double.POSITIVE_INFINITY;
+        Double minLocalDistance = Double.POSITIVE_INFINITY;
+        EuclideanDistance e = new EuclideanDistance(centroids);
+
+        for (int i = 0; i < numOfClusters - 1; i++) {
+            minLocalDistance = Double.POSITIVE_INFINITY;
+            for (int j = i + 1; j < numOfClusters; j++) {
+                minLocalDistance = Double.min(minLocalDistance, e.distance(centroids.instance(i), centroids.instance(j)));
+            }
+            minIntraclusterDistance = Double.min(minIntraclusterDistance, minLocalDistance);
+        }
+
+        return minIntraclusterDistance / maxTotal;
+    }
+
+    // ** gD53 **
+
+    public Double gD53(){
+
+        //get max inter-cluster distance
+
+        Double maxTotal = Double.NEGATIVE_INFINITY;
+        Double maxForCluster = Double.MIN_VALUE;
+        for (int i = 0; i < numOfClusters; i++) {
+            Instances currCluster = clusters.get(i);
+            Double result;
+
+            int size1 = currCluster.numInstances();
+            currCluster.add(centroids.instance(i));
+            EuclideanDistance d1 = new EuclideanDistance(currCluster);
+            Double sumTmp = 0.0;
+            for (int j = 0; j < size1; j++) {
+                sumTmp += d1.distance(currCluster.instance(i), currCluster.lastInstance());
+            }
+            currCluster.delete(currCluster.numInstances() - 1);
+            sumTmp *= (2 / size1);
+            maxTotal = Double.max(maxTotal, sumTmp);
+        }
+
+        //get min intra-cluster distance
+
+        Double minIntraclusterDistance = Double.POSITIVE_INFINITY;
+        Double minLocalDistance = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < numOfClusters - 1; i++) {
+            minLocalDistance = Double.POSITIVE_INFINITY;
+            for (int j = i + 1; j < numOfClusters; j++) {
+                minLocalDistance = Double.min(minLocalDistance, delta5(i, j));
+            }
+            minIntraclusterDistance = Double.min(minIntraclusterDistance, minLocalDistance);
+        }
+
+        return minIntraclusterDistance / maxTotal;
+    }
+
+
 
 }
