@@ -1,6 +1,7 @@
 package ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.clustering;
 
 import ru.ifmo.ctddev.FSSARecSys.alternative.internal.Clusterisation;
+import ru.ifmo.ctddev.FSSARecSys.utils.PictureManagement;
 import weka.classifiers.Classifier;
 import weka.clusterers.*;
 import weka.core.Instance;
@@ -97,6 +98,9 @@ public class ClustererEvaluator {
             }
 
             int numClusters = eval.getNumClusters();
+
+            PictureManagement pm = new PictureManagement(numClusters, data, clusterAssignments);
+            pm.DrawPicture(datasetName + "_" + name);
 
             // Instances in = new Instances()
             ArrayList<Instances> clusters = new ArrayList<>(numClusters);

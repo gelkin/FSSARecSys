@@ -35,7 +35,8 @@ public class Clusterisation {
 
         centroids = new Instances(clusters.get(0), 0);
 
-        NW = nW();
+        //NW = nW();
+        NW = 0.0;
     }
 
     public Integer getNumClusters(){
@@ -711,7 +712,8 @@ public class Clusterisation {
         int result = 0;
         for (int i = 0; i < numOfClusters; i++) {
             int n = clusters.get(i).numInstances();
-            result += fact(n) / (fact(2) * (fact(n - 2)));
+            if (n > 2)
+                result += fact(n) / (fact(2) * (fact(n - 2)));
         }
         Integer answer = result;
         return answer.doubleValue();
@@ -1047,7 +1049,7 @@ public class Clusterisation {
 
         cluster1.delete(cluster1.numInstances() - 1);
         cluster2.delete(cluster2.numInstances() - 1);
-        
+
         result = (sum1 + sum2) / (size1 + size2);
 
         return result;

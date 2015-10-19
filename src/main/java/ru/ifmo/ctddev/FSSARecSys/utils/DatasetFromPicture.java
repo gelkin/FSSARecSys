@@ -29,7 +29,7 @@ public class DatasetFromPicture {
 
     public static void main(String[] args) throws IOException {
 
-        String name = "center";
+        String name = "linked";
 
         File sourceimage = new File(name + ".jpg");
         image = ImageIO.read(sourceimage);

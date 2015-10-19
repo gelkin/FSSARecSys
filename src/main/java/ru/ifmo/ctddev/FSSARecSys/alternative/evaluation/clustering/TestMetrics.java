@@ -68,7 +68,7 @@ public class TestMetrics {
         MLAlgorithm mlHieracical = new MLAlgorithm("Hieracical", "weka.clusterers.HierarchicalClusterer", "-N 5 -L MEAN -P -A \"weka.core.EuclideanDistance -R first-last\"", "clusterisation");
         MLAlgorithm mlXmeans = new MLAlgorithm("X-Means", "weka.clusterers.XMeans", "-I 1 -M 1000 -J 1000 -L 2 -H 6 -B 1.0 -C 0.5 -D \"weka.core.EuclideanDistance -R first-last\" -S 10", "clusterisation");
 
-        ArrayList<Double> tmp = null;
+        ArrayList<Double> tmp = new ArrayList<>();
 
         tmp = evaluateWithMetrics(dataset, mlkMeans);
         algoMap.put(resultMatrix.size(), mlkMeans.getName());
