@@ -32,6 +32,14 @@ public class PictureManagement {
         colors.add(Color.MAGENTA);
         colors.add(Color.YELLOW);
         colors.add(Color.getHSBColor(180, 240, 120));
+        colors.add(Color.getHSBColor(120, 80, 90));
+        colors.add(Color.getHSBColor(40, 80, 90));
+        colors.add(Color.getHSBColor(200, 240, 30));
+        colors.add(Color.getHSBColor(200, 240, 132));
+        colors.add(Color.getHSBColor(0, 240, 60));
+        colors.add(Color.getHSBColor(88, 228, 133));
+
+
     }
 
     public PictureManagement(int n, Instances dataSet, int[] assignments) {
@@ -62,8 +70,9 @@ public class PictureManagement {
             ig.draw(new Line2D.Double(x-1, y-1, x+1, y+1));
             ig.draw(new Line2D.Double(x-1, y+1, x+1, y-1));
 
-            ImageIO.write(bi, "PNG", new File(name + ".PNG"));
         }
+        File file = new File(name + ".PNG");
+        ImageIO.write(bi, "PNG", file);
 
     }
 }
