@@ -1,0 +1,17 @@
+center
+stripes
+perfect_overlap
+perfect_overlap2
+overlap
+linked
+folded
+end_overlap
+double_spiral
+curved_stripes
+curved_stripes_adv
+specified
+half-kernel
+corners
+t_corners
+angled_stripes
+x
