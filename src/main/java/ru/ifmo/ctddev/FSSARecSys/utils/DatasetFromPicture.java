@@ -1,5 +1,9 @@
 package ru.ifmo.ctddev.FSSARecSys.utils;
 
+import weka.core.Instances;
+import weka.core.converters.ArffSaver;
+import weka.core.converters.CSVLoader;
+
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -29,7 +33,7 @@ public class DatasetFromPicture {
 
     public static void main(String[] args) throws IOException {
 
-        String name = "folded";
+        String name = "x";
 
         File sourceimage = new File(name + ".jpg");
         image = ImageIO.read(sourceimage);
@@ -50,5 +54,16 @@ public class DatasetFromPicture {
         for (Pair<Integer, Integer> p : result)
         writer.println(p.first + "," + p.second);
         writer.close();
+
+        CSVLoader loader = new CSVLoader();
+        loader.setSource(new File(name + ".csv"));
+        Instances data = loader.getDataSet();
+
+        // save ARFF
+        ArffSaver saver = new ArffSaver();
+        saver.setInstances(data);
+        saver.setFile(new File(name + ".arff"));
+        //saver.setDestination(new File(name + ".arff"));
+        saver.writeBatch();
     }
 }

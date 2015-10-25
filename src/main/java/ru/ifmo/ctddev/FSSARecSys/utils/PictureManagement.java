@@ -38,8 +38,10 @@ public class PictureManagement {
         colors.add(Color.getHSBColor(200, 240, 132));
         colors.add(Color.getHSBColor(0, 240, 60));
         colors.add(Color.getHSBColor(88, 228, 133));
-
-
+        colors.add(Color.getHSBColor(160, 240, 180));
+        colors.add(Color.getHSBColor(80, 240, 120));
+        colors.add(Color.getHSBColor(140, 240, 120));
+        colors.add(Color.getHSBColor(220, 240, 180));
     }
 
     public PictureManagement(int n, Instances dataSet, int[] assignments) {
