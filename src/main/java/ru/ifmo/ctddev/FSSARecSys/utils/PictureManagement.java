@@ -42,6 +42,40 @@ public class PictureManagement {
         colors.add(Color.getHSBColor(80, 240, 120));
         colors.add(Color.getHSBColor(140, 240, 120));
         colors.add(Color.getHSBColor(220, 240, 180));
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+        colors.add(Color.DARK_GRAY);
+
     }
 
     public PictureManagement(int n, Instances dataSet, int[] assignments) {
@@ -51,13 +85,14 @@ public class PictureManagement {
         assignColors();
     }
 
-    public void DrawPicture(String name) throws IOException {
-        BufferedImage bi = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
+    public void DrawPicture(String datasetName, String algoName, int width, int height) throws IOException {
+        BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
         Graphics2D ig = bi.createGraphics();
 
         ig.setColor(Color.WHITE);
-        ig.fillRect(0, 0, 500, 500);
+
+        ig.fillRect(0, 0, width, height);
 
         ig.setBackground(Color.WHITE);
         for (int i = 0; i < dataSet.numInstances(); i++){
@@ -71,9 +106,16 @@ public class PictureManagement {
                 ig.setPaint(colors.get(assignments[i]));
             ig.draw(new Line2D.Double(x-1, y-1, x+1, y+1));
             ig.draw(new Line2D.Double(x-1, y+1, x+1, y-1));
+            ig.draw(new Line2D.Double(x-1, y, x+1, y));
+            ig.draw(new Line2D.Double(x, y-1, x, y-1));
+
+            ig.setPaint(Color.black);
+            ig.drawString(algoName, width / 3, height - 25);
 
         }
-        File file = new File(name + ".PNG");
+
+        //datasetName + "__" + algoName
+        File file = new File("/home/sergey/masters/FSSARecSys/final/" + datasetName + "__" + algoName + ".png");
         ImageIO.write(bi, "PNG", file);
 
     }

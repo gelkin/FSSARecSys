@@ -33,7 +33,7 @@ public class DatasetFromPicture {
 
     public static void main(String[] args) throws IOException {
 
-        String name = "x";
+        String name = "circle_in_star";
 
         File sourceimage = new File(name + ".jpg");
         image = ImageIO.read(sourceimage);
@@ -62,7 +62,7 @@ public class DatasetFromPicture {
         // save ARFF
         ArffSaver saver = new ArffSaver();
         saver.setInstances(data);
-        saver.setFile(new File(name + ".arff"));
+        saver.setFile(new File("/home/sergey/masters/FSSARecSys/test/" + name + ".arff"));
         //saver.setDestination(new File(name + ".arff"));
         saver.writeBatch();
     }

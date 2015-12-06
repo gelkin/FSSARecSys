@@ -35,8 +35,8 @@ public class Clusterisation {
 
         centroids = new Instances(clusters.get(0), 0);
 
-        //NW = nW();
-        NW = 0.0;
+        NW = nW();
+        //NW = 0.0;
     }
 
     public Integer getNumClusters(){
@@ -537,7 +537,8 @@ public class Clusterisation {
             for (int j = 0; j < 0.1 * (currCluster.numInstances()); j++){
                 sum += dist.get(j);
             }
-            sum *= (10 / currCluster.numInstances());
+            sum *= 10;
+            sum /= currCluster.numInstances();
             denominator += sum;
         }
 
@@ -568,11 +569,12 @@ public class Clusterisation {
                 for (int j = 0; j < currCluster.numInstances(); j++) {
                     dist.add(e.distance(currCluster.instance(j), cluster.instance(xi)));
                 }
+                Collections.sort(dist);
+                for (int j = 0; j < currCluster.numInstances(); j++){
+                    sum += dist.get(j);
+                }
             }
-            Collections.sort(dist);
-            for (int j = 0; j < cluster.numInstances(); j++){
-                sum += dist.get(j);
-            }
+
         }
         return sum /= cluster.numInstances();
     }
@@ -619,7 +621,8 @@ public class Clusterisation {
             for (int j = 0; j < 0.1 * (currCluster.numInstances()); j++){
                 sum += dist.get(j);
             }
-            sum *= (10 / currCluster.numInstances());
+            sum *= 10;
+            sum /= currCluster.numInstances();
             denominator += sum;
         }
         return numerator / denominator;
@@ -689,7 +692,7 @@ public class Clusterisation {
         Double distance = e.distance(comparedCluster.instance(t1), comparedCluster.instance(t2));
         for (int i = 0; i < numOfClusters - 1; i++) {
             for (int j = i + 1; j < numOfClusters; j++) {
-                if (i != ck && j != ck){
+                if (i != j){
                     Instances clusterFirst = clusters.get(i);
                     Instances clusterSecond = clusters.get(j);
 
@@ -704,19 +707,22 @@ public class Clusterisation {
         return answer.doubleValue();
     }
 
-    private int fact(int num) {
-        return (num == 0) ? 1 : num * fact(num - 1);
+    private Double fact(Double num) {
+        return (num == 0.0) ? 1.0 : num * fact(num - 1.0);
     }
 
     private Double nW(){
-        int result = 0;
+        Double result = 0.0;
         for (int i = 0; i < numOfClusters; i++) {
             int n = clusters.get(i).numInstances();
-            if (n > 2)
-                result += fact(n) / (fact(2) * (fact(n - 2)));
+            Double num = Double.valueOf(n);
+            if (n > 2) {
+//                Double nf = fact(num);
+//                Double kf = fact(2.0) * fact(num - 2.0);
+                result += num * (num - 1.0) / 2.0;
+            }
         }
-        Integer answer = result;
-        return answer.doubleValue();
+        return result;
     }
 
     public Double Gamma(){
@@ -725,7 +731,7 @@ public class Clusterisation {
         for (int i = 0; i < numOfClusters; i++) {
             Instances cluster = clusters.get(i);
             for (int j = 0; j < cluster.numInstances() - 1; j++) {
-                for (int k = j; k < cluster.numInstances(); k++){
+                for (int k = j + 1; k < cluster.numInstances(); k++){
                     numerator += dl(j, k, i);
                 }
             }
@@ -734,8 +740,10 @@ public class Clusterisation {
         Double denominator = 0.0;
 
         int N = unitedClusters.numInstances();
-        Integer tmpN2 = fact(N) / (fact(2) * fact(N - 2));
-        Double N2 = tmpN2.doubleValue();
+        //Double tmpN2 = fact(Double.valueOf(N)) / (fact(2.0) * fact(Double.valueOf(N - 2)));
+        Double N2 = (N * (N - 1)) / 2.0 ;//tmpN2.doubleValue();
+
+        //NW = nW();
 
         denominator = NW * (N2 - NW);
 
@@ -1115,7 +1123,8 @@ public class Clusterisation {
             }
             currCluster.delete(currCluster.numInstances() - 1);
 
-            sumTmp *= (2 / size1);
+            sumTmp *= 2;
+            sumTmp /=  size1;
             maxTotal = Double.max(maxTotal, sumTmp);
         }
 
@@ -1155,7 +1164,8 @@ public class Clusterisation {
             }
             currCluster.delete(currCluster.numInstances() - 1);
 
-            sumTmp *= (2 / size1);
+            sumTmp *= 2;
+            sumTmp /=  size1;
             maxTotal = Double.max(maxTotal, sumTmp);
         }
 
@@ -1196,7 +1206,8 @@ public class Clusterisation {
                 sumTmp += d1.distance(currCluster.instance(i), currCluster.lastInstance());
             }
             currCluster.delete(currCluster.numInstances() - 1);
-            sumTmp *= (2 / size1);
+            sumTmp *= 2;
+            sumTmp /=  size1;
             maxTotal = Double.max(maxTotal, sumTmp);
         }
 

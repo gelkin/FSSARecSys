@@ -2,15 +2,10 @@ package ru.ifmo.ctddev.FSSARecSys.alternative.evaluation.clustering;
 
 import ru.ifmo.ctddev.FSSARecSys.alternative.internal.Clusterisation;
 import ru.ifmo.ctddev.FSSARecSys.utils.PictureManagement;
-import weka.classifiers.Classifier;
 import weka.clusterers.*;
-import weka.core.Instance;
 import weka.core.Instances;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Objects;
 
 /**
@@ -28,6 +23,21 @@ public class ClustererEvaluator {
     private Double CHIndex = Double.NEGATIVE_INFINITY;
     private Double SDbwIndex = Double.NEGATIVE_INFINITY;
     private Double SFIndex = Double.NEGATIVE_INFINITY;
+    private Double CSIndex = Double.NEGATIVE_INFINITY;
+    private Double COP = Double.NEGATIVE_INFINITY;
+    private Double SV = Double.NEGATIVE_INFINITY;
+    private Double OS = Double.NEGATIVE_INFINITY;
+    private Double SymIndex = Double.NEGATIVE_INFINITY;
+    private Double Gamma = Double.NEGATIVE_INFINITY;
+    private Double CI = Double.NEGATIVE_INFINITY;
+    private Double DaviesBouldinStarIndex = Double.NEGATIVE_INFINITY;
+    private Double SymDB = Double.NEGATIVE_INFINITY;
+    private Double GD31 = Double.NEGATIVE_INFINITY;
+    private Double GD41 = Double.NEGATIVE_INFINITY;
+    private Double GD51 = Double.NEGATIVE_INFINITY;
+    private Double GD33 = Double.NEGATIVE_INFINITY;
+    private Double GD43 = Double.NEGATIVE_INFINITY;
+    private Double GD53 = Double.NEGATIVE_INFINITY;
 
 
     public ClustererEvaluator(String name, Clusterer clusterer) {
@@ -76,6 +86,97 @@ public class ClustererEvaluator {
         return SFIndex;
     }
 
+    public Double getCS() throws Exception{
+        if (CSIndex == Double.NEGATIVE_INFINITY)
+            CSIndex = clusterisation.CS();
+        return CSIndex;
+    }
+
+    public Double getCOP(){
+        if (COP == Double.NEGATIVE_INFINITY)
+            COP = clusterisation.COP();
+        return COP;
+    }
+
+    public Double getSV(){
+        if (SV == Double.NEGATIVE_INFINITY)
+            SV = clusterisation.SV();
+        return SV;
+    }
+
+    public Double getOS() {
+        if (OS == Double.NEGATIVE_INFINITY)
+            OS = clusterisation.OS();
+        return OS;
+    }
+
+    public Double getSymIndex() {
+        if (SymIndex == Double.NEGATIVE_INFINITY)
+            SymIndex = clusterisation.SymIndex();
+        return SymIndex;
+    }
+
+    public Double getGamma() {
+        if (Gamma == Double.NEGATIVE_INFINITY)
+            Gamma = clusterisation.Gamma();
+        return Gamma;
+    }
+
+    public Double getCI() {
+        if (CI == Double.NEGATIVE_INFINITY)
+            CI = clusterisation.CI();
+        return CI;
+    }
+
+    public Double getDaviesBouldinStarIndex() throws Exception {
+        if (DaviesBouldinStarIndex == Double.NEGATIVE_INFINITY)
+            DaviesBouldinStarIndex = clusterisation.DaviesBouldinStarIndex();
+        return DaviesBouldinStarIndex;
+    }
+
+    public Double getSymDB() throws Exception {
+        if (SymDB == Double.NEGATIVE_INFINITY)
+            SymDB = clusterisation.SymDB();
+        return SymDB;
+    }
+
+    public Double getGD31() {
+        if (GD31 == Double.NEGATIVE_INFINITY)
+            GD31 = clusterisation.gD31();
+        return GD31;
+    }
+
+    public Double getGD41() {
+        if (GD41 == Double.NEGATIVE_INFINITY)
+            GD41 = clusterisation.gD41();
+        return GD41;
+    }
+
+    public Double getGD51() {
+        if (GD51 == Double.NEGATIVE_INFINITY)
+            GD51 = clusterisation.gD51();
+        return GD51;
+    }
+
+    public Double getGD33() {
+        if (GD33 == Double.NEGATIVE_INFINITY)
+            GD33 = clusterisation.gD33();
+        return GD33;
+    }
+
+    public Double getGD43() {
+        if (GD43 == Double.NEGATIVE_INFINITY)
+            GD43 = clusterisation.gD43();
+        return GD43;
+    }
+
+    public Double getGD53() {
+        if (GD53 == Double.NEGATIVE_INFINITY)
+            GD53 = clusterisation.gD53();
+        return GD53;
+    }
+
+
     public Double getCombinedMetric() throws Exception {
         return Math.sqrt(Math.pow(getDBIndex(), 2.0) + Math.pow((1 / getDunnIndex()), 2.0) + Math.pow((1 / getSilhouetteIndex()), 2.0));
     }
@@ -93,14 +194,18 @@ public class ClustererEvaluator {
             double[] tmpDistribution = eval.getClusterAssignments();
             int[] clusterAssignments = new int[data.numInstances()];
 
+            Double xmax = Double.NEGATIVE_INFINITY;
+            Double ymax = Double.NEGATIVE_INFINITY;
             for (int i = 0; i < data.numInstances(); i++) {
                 clusterAssignments[i] = (int) tmpDistribution[i];
+                xmax = Double.max(xmax, data.instance(i).value(0));
+                ymax = Double.max(ymax, data.instance(i).value(1));
             }
 
             int numClusters = eval.getNumClusters();
 
             PictureManagement pm = new PictureManagement(numClusters, data, clusterAssignments);
-            pm.DrawPicture(datasetName + "_" + name);
+            pm.DrawPicture(datasetName, name, xmax.intValue() + 50, ymax.intValue() + 70);
 
             // Instances in = new Instances()
             ArrayList<Instances> clusters = new ArrayList<>(numClusters);
