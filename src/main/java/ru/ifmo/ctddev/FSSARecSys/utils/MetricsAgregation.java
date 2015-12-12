@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -22,10 +23,11 @@ import java.util.*;
 public class MetricsAgregation {
     private String result = "result.xlsx";
     public HSSFWorkbook myWorkBook;
+    public static ArrayList<Integer> metricsWithBestMin = new ArrayList<>();
 
     public List<ArrayList<Double>> metrics;
     public List<ArrayList<Double>> asessors;
-    public List<Double> avgAs;
+    public List<Integer> avgAs;
 
     public void setMyWorkBook(FileInputStream myWorkBook) throws IOException {
         this.myWorkBook = new HSSFWorkbook(myWorkBook);
@@ -91,24 +93,62 @@ public class MetricsAgregation {
         for (int i = 0; i < 14; i++) {
             int count = 0;
             for (int j = 0; j < 5; j++) {
-                if (asessors.get(i).get(j) > 0)
+                if (asessors.get(j).get(i) > 0)
                     count++;
             }
             if (count < 2)
-                avgAs.add(-1.0);
+                avgAs.add(-1);
             else {
                 if (count == 2)
-                    avgAs.add(0.0);
+                    avgAs.add(0);
                 else
-                    avgAs.add(1.0);
+                    avgAs.add(1);
             }
         }
 
-        ArrayList<Double> avgSorted = new ArrayList<>(avgAs);
+        ArrayList<Integer> avgSorted = new ArrayList<>(avgAs);
         Collections.sort(avgSorted);
 
-        ArrayList<Double> avgSortedRev = new ArrayList<>(avgSorted);
+        ArrayList<Integer> avgSortedRev = new ArrayList<>(avgSorted);
         Collections.reverse(avgSortedRev);
+
+        ArrayList<Pair<Double, Integer>> permutation = new ArrayList<>();
+        for (int i = 0; i < metrics.size(); i++) {
+            for (int j = 0; j < metrics.get(i).size(); j++) {
+                permutation.add(new Pair<Double, Integer>(metrics.get(i).get(j), avgAs.get(j)));
+            }
+            Collections.sort(permutation, new Comparator<Pair<Double, Integer>>() {
+                @Override
+                public int compare(Pair<Double, Integer> o1, Pair<Double, Integer> o2) {
+                    if ((Double) o1.first < (Double) o2.first)
+                        return 1;
+                    if ((Double) o1.first == (Double) o2.first) {
+                        if ((Integer) o1.second < (Integer) o2.second)
+                            return 1;
+                        if ((Integer) o1.second == (Integer) o2.second)
+                            return 0;
+                        else return -1;
+                    } else {
+                        return -1;
+                    }
+                }
+            });
+
+            if (!metricsWithBestMin.contains(i)) {
+                Collections.reverse(permutation);
+            }
+
+            for (int j = 0; j < permutation.size(); j++) {
+                avgAs.set(j, permutation.get(j).second);
+            }
+
+            for (int j = 0; j < permutation.size(); j++) {
+
+            }
+
+        }
+
+
     }
 
     public static void main(String [] args) throws IOException {
@@ -117,6 +157,7 @@ public class MetricsAgregation {
 
         MetricsAgregation ma = new MetricsAgregation();
         ma.myWorkBook = new HSSFWorkbook(fis);
+        Collections.addAll(metricsWithBestMin, 1, 5, 9, 10, 12, 13);
 
         ma.sheetProcessing(0);
     }
