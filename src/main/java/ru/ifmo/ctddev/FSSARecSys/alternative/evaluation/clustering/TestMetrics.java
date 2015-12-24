@@ -116,6 +116,8 @@ public class TestMetrics {
             System.out.println("******************************************************");
             System.out.println(fi.getName());
 
+            resultMatrix = new ArrayList<ArrayList<Double>>();
+
             MLAlgorithm mlkMeans1 = new MLAlgorithm("K-means-1", "weka.clusterers.SimpleKMeans", "-N 5 -A \"weka.core.EuclideanDistance -R first-last\" -I 500 -S 10", "clusterisation");
             MLAlgorithm mlkMeans2 = new MLAlgorithm("K-means-2", "weka.clusterers.SimpleKMeans", "-N 5 -A \"weka.core.EuclideanDistance -R first-last\" -I 500 -S 100", "clusterisation");
             MLAlgorithm mlkMeans3 = new MLAlgorithm("K-means-3", "weka.clusterers.SimpleKMeans", "-N 5 -A \"weka.core.EuclideanDistance -R first-last\" -I 500 -S 200", "clusterisation");
@@ -131,16 +133,8 @@ public class TestMetrics {
             MLAlgorithm mlXmeans2 = new MLAlgorithm("X-Means-2", "weka.clusterers.XMeans", "-I 1 -M 1000 -J 1000 -L 2 -H 6 -B 1.0 -C 0.5 -D \"weka.core.EuclideanDistance -R first-last\" -S 100", "clusterisation");
             MLAlgorithm mlXmeans3 = new MLAlgorithm("X-Means-3", "weka.clusterers.XMeans", "-I 1 -M 1000 -J 1000 -L 2 -H 6 -B 1.0 -C 0.5 -D \"weka.core.EuclideanDistance -R first-last\" -S 200", "clusterisation");
 
-            tmp = evaluateWithMetrics(dataset, mlkMeans1);
-            algoMap.put(resultMatrix.size(), mlkMeans1.getName());
-            resultMatrix.add(tmp);
-
-            tmp = evaluateWithMetrics(dataset, mlkMeans2);
-            algoMap.put(resultMatrix.size(), mlkMeans2.getName());
-            resultMatrix.add(tmp);
-
-            tmp = evaluateWithMetrics(dataset, mlkMeans3);
-            algoMap.put(resultMatrix.size(), mlkMeans3.getName());
+            tmp = evaluateWithMetrics(dataset, mlDBSCAN);
+            algoMap.put(resultMatrix.size(), mlDBSCAN.getName());
             resultMatrix.add(tmp);
 
             tmp = evaluateWithMetrics(dataset, mlEM1);
@@ -153,10 +147,6 @@ public class TestMetrics {
 
             tmp = evaluateWithMetrics(dataset, mlEM3);
             algoMap.put(resultMatrix.size(), mlEM3.getName());
-            resultMatrix.add(tmp);
-
-            tmp = evaluateWithMetrics(dataset, mlDBSCAN);
-            algoMap.put(resultMatrix.size(), mlDBSCAN.getName());
             resultMatrix.add(tmp);
 
             tmp = evaluateWithMetrics(dataset, mlFarthestFirst1);
@@ -173,6 +163,18 @@ public class TestMetrics {
 
             tmp = evaluateWithMetrics(dataset, mlHieracical);
             algoMap.put(resultMatrix.size(), mlHieracical.getName());
+            resultMatrix.add(tmp);
+
+            tmp = evaluateWithMetrics(dataset, mlkMeans1);
+            algoMap.put(resultMatrix.size(), mlkMeans1.getName());
+            resultMatrix.add(tmp);
+
+            tmp = evaluateWithMetrics(dataset, mlkMeans2);
+            algoMap.put(resultMatrix.size(), mlkMeans2.getName());
+            resultMatrix.add(tmp);
+
+            tmp = evaluateWithMetrics(dataset, mlkMeans3);
+            algoMap.put(resultMatrix.size(), mlkMeans3.getName());
             resultMatrix.add(tmp);
 
             tmp = evaluateWithMetrics(dataset, mlXmeans1);
