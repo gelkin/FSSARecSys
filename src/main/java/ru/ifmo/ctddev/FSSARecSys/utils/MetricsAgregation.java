@@ -10,6 +10,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import ru.ifmo.ctddev.FSSARecSys.db.internal.Metrics;
 
+import java.awt.image.AreaAveragingScaleFilter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -311,6 +312,21 @@ public class MetricsAgregation {
 
     }
 
+    public ArrayList<ArrayList<Double>> deepAggregation(ArrayList<ArrayList<Double>> evaluations) {
+        ArrayList<Set<Double>> unique = new ArrayList<>();
+        ArrayList<ArrayList<Double>> sorted = new ArrayList<>();
+        for (int i = 0; i < evaluations.get(0).size(); i++) {
+            unique.add(new HashSet<>());
+            for (int j = 0; j < evaluations.size(); j++) {
+                unique.get(i).add(evaluations.get(j).get(i));
+            }
+            sorted.add(new ArrayList<>());
+            sorted.get(i).addAll(unique.get(i));
+            Collections.sort(sorted.get(i));
+        }
+        return sorted;
+    }
+
     public static void main(String [] args) throws IOException {
         File myFile = new File("results.xls");
         FileInputStream fis = new FileInputStream(myFile);
@@ -355,6 +371,122 @@ public class MetricsAgregation {
                 System.out.printf("%-20s", ma.rang.get(i).get(j));
             }
             System.out.println();
+        }
+
+        ArrayList<ArrayList<Double>> uniqueAdeq = ma.deepAggregation(ma.adeqAVG);
+        ArrayList<ArrayList<Double>> uniqueRang = ma.deepAggregation(ma.rang);
+
+        ArrayList<ArrayList<Integer>> adeqEvaluation = new ArrayList<>();
+        ArrayList<ArrayList<Integer>> rangEvaluation = new ArrayList<>();
+
+        ArrayList<Integer> tmpNull = new ArrayList<>();
+        for (int i = 0; i < ma.adeqAVG.size(); i++)
+            tmpNull.add(0);
+
+        Double counter = 0.0;
+        int n = ma.adeqAVG.size();
+        int m = ma.adeqAVG.get(0).size();
+        for (int i = 0; i < m; i++) {
+            adeqEvaluation.add(new ArrayList<>(tmpNull));
+            if (uniqueAdeq.get(i).size() > 1) {
+                counter += 1.0;
+                for (int j = 0; j < n; j++) {
+                    if (uniqueAdeq.get(i).size() == 2) {
+                        if (Double.compare(ma.adeqAVG.get(j).get(i), uniqueAdeq.get(i).get(0)) == 0
+                                || Double.compare(ma.adeqAVG.get(j).get(i), uniqueAdeq.get(i).get(1)) == 0) {
+                            adeqEvaluation.get(i).set(j, adeqEvaluation.get(i).get(j) + 1);
+                        }
+                    } else {
+                        if (Double.compare(ma.adeqAVG.get(j).get(i), uniqueAdeq.get(i).get(0)) == 0
+                                || Double.compare(ma.adeqAVG.get(j).get(i), uniqueAdeq.get(i).get(1)) == 0
+                                || Double.compare(ma.adeqAVG.get(j).get(i), uniqueAdeq.get(i).get(2)) == 0) {
+                            adeqEvaluation.get(i).set(j, adeqEvaluation.get(i).get(j) + 1);
+                        }
+                    }
+
+                }
+            }
+        }
+
+        for (int i = 0; i < m; i++) {
+            rangEvaluation.add(new ArrayList<>(tmpNull));
+            if (uniqueRang.get(i).size() > 1) {
+                for (int j = 0; j < n; j++) {
+                    if (uniqueRang.get(i).size() == 2) {
+                        if (Double.compare(ma.rang.get(j).get(i), uniqueRang.get(i).get(0)) == 0
+                                || Double.compare(ma.rang.get(j).get(i), uniqueRang.get(i).get(1)) == 0) {
+                            rangEvaluation.get(i).set(j, rangEvaluation.get(i).get(j) + 1);
+                        }
+                    } else {
+                        if (Double.compare(ma.rang.get(j).get(i), uniqueRang.get(i).get(0)) == 0
+                                || Double.compare(ma.rang.get(j).get(i), uniqueRang.get(i).get(1)) == 0
+                                || Double.compare(ma.rang.get(j).get(i), uniqueRang.get(i).get(2)) == 0) {
+                            rangEvaluation.get(i).set(j, rangEvaluation.get(i).get(j) + 1);
+                        }
+                    }
+
+                }
+            }
+        }
+
+        ArrayList<Double> avgAdeq = new ArrayList<>();
+        ArrayList<Double> avgRang = new ArrayList<>();
+
+        System.out.println();
+        System.out.println();
+
+        for (int i = 0; i < adeqEvaluation.get(0).size(); i++) {
+            Double sumTmp = 0.0;
+            for (int j = 0; j < adeqEvaluation.size(); j++) {
+                System.out.printf("%-20s", adeqEvaluation.get(j).get(i));
+                sumTmp += adeqEvaluation.get(j).get(i);
+            }
+            avgAdeq.add(sumTmp / counter);
+            System.out.println();
+        }
+
+        System.out.println();
+        System.out.println();
+
+        for (int i = 0; i < rangEvaluation.get(0).size(); i++) {
+            Double sumTmp = 0.0;
+            for (int j = 0; j < rangEvaluation.size(); j++) {
+                System.out.printf("%-20s", rangEvaluation.get(j).get(i));
+                sumTmp += rangEvaluation.get(j).get(i);
+            }
+            System.out.println();
+            avgRang.add(sumTmp / 41.0);
+        }
+
+        System.out.println();
+        System.out.println();
+
+        for (int i = 0; i < avgAdeq.size(); i++){
+            System.out.println(avgAdeq.get(i));
+        }
+
+        System.out.println();
+        System.out.println();
+
+        for (int i = 0; i < avgRang.size(); i++){
+            System.out.println(avgRang.get(i));
+        }
+
+        ArrayList<Integer> stars = new ArrayList<>();
+        ArrayList<Integer> plus = new ArrayList<>();
+        for (int i = 0; i < ma.adeqBest.size(); i++) {
+            int countPlus = 0;
+            int countStar = 0;
+            for (int j = 0; j < ma.adeqBest.get(i).size(); j++) {
+                if (ma.adeqBest.get(i).get(j).equals("+"))
+                    countPlus++;
+                if (ma.adeqBest.get(i).get(j).equals("*"))
+                    countStar++;
+            }
+            stars.add(countStar);
+            plus.add(countPlus);
+
+            System.out.println("\"+\": " + countPlus + "; \"*\": " + countStar);
         }
 
     }
