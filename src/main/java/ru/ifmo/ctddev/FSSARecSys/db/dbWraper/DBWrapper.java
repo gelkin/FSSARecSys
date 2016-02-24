@@ -96,6 +96,17 @@ public class DBWrapper {
         return result;
     }
 
+    public static void ClearSchema() throws Exception {
+//        readDataBase();
+//
+//        PreparedStatement preparedStatement = connect
+//                .prepareStatement("delete from FSS.Fsalgorithm where id > 0; " +
+//                        " delete from FSS.Dataset where id > 0; " +
+//
+//                        "set @@global.max_connections = 1250;");
+//            preparedStatement.executeUpdate();
+    }
+
     public static ArrayList<Dataset> getAllClassificationDatasets() throws Exception {
         readDataBase();
 
@@ -619,6 +630,9 @@ public class DBWrapper {
         }
         return result;
     }
+
+
+
 
     public static EARRParams getEARRParams(Metrics metrics, MLAlgorithm algo) throws Exception {
         readDataBase();

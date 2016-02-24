@@ -21,7 +21,8 @@ public class EARREvaluation {
     private ClassifierResult classifierResult;
     private float alpha;
     private float betta;
-    private QueryManager queryManager;
+private QueryManager
+    queryManager = new QueryManager("jdbc:mysql://localhost/fss", "newuser", "Sudarikov94");
 
     public EARREvaluation(float alpha, float betta, QueryManager queryManager) {
         this.alpha = alpha;
@@ -30,6 +31,7 @@ public class EARREvaluation {
     }
 
     private Double EARR_ij(EARRParams params1, EARRParams params2) {
+        
         return (params1.getAccuracy() / params2.getAccuracy()) / (1.0 +
                 alpha * Math.log(params1.getSelectionTime() / params2.getSelectionTime()) +
                 betta * (params1.getNumberOfSelectedFeatures() / params2.getNumberOfSelectedFeatures()));
@@ -39,7 +41,7 @@ public class EARREvaluation {
         Double sum = 0.0;
         String datasetName = dataset.getName();
 
-        // if params for current fss algorithm is counted
+
         EARRParams newParams = queryManager.getEARRParams(new Metrics(algo, datasetName, listOfFeatures), mlAlgorithm);
         if (newParams == null){
 

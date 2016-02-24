@@ -126,7 +126,10 @@ public class SimpleFSSAlgorithmManager implements FSSAlgorithmManager {
     private final List<String> algorithmNames = new ArrayList<>();
     private final Map<String, FSSAlgorithm> nameToAlgorithm = new HashMap<>();
 
-    private SimpleFSSAlgorithmManager() {
+    private final Map<String, ru.ifmo.ctddev.FSSARecSys.db.internal.FSSAlgorithm> dbAlgorithms = new HashMap<>();
+
+    public ArrayList<FSSAlgorithmImpl> implementations = new ArrayList<>();
+    public  SimpleFSSAlgorithmManager() {
         register(CFS_SBS, CFS_SBS_SEARCH_CLASS, CFS_SBS_SEARCH_OPTIONS, CFS_SBS_EVALUATION_CLASS, CFS_SBS_EVALUATION_OPTIONS);
         register(CFS_SFS, CFS_SFS_SEARCH_CLASS, CFS_SFS_SEARCH_OPTIONS, CFS_SFS_EVALUATION_CLASS, CFS_SFS_EVALUATION_OPTIONS);
         register(CFS_BIS, CFS_BIS_SEARCH_CLASS, CFS_BIS_SEARCH_OPTIONS, CFS_BIS_EVALUATION_CLASS, CFS_BIS_EVALUATION_OPTIONS);
@@ -155,14 +158,22 @@ public class SimpleFSSAlgorithmManager implements FSSAlgorithmManager {
         return nameToAlgorithm.get(name);
     }
 
+    public ru.ifmo.ctddev.FSSARecSys.db.internal.FSSAlgorithm getDb(String name)
+    {
+        return dbAlgorithms.get(name);
+    }
+
     @Override
     public boolean register(String name, String searchClassName, String[] searchOptions, String evaluationClassName, String[] evaluationOptions) {
         if (!algorithmNames.contains(name)) {
             try {
                 ASSearch search = ASSearch.forName(searchClassName, searchOptions);
                 ASEvaluation evaluation = ASEvaluation.forName(evaluationClassName, evaluationOptions);
-                FSSAlgorithm fssAlgorithm = new FSSAlgorithmImpl(name, search, evaluation);
+                FSSAlgorithmImpl fssAlgorithm = new FSSAlgorithmImpl(name, search, evaluation);
+              implementations.add(fssAlgorithm);
+                ru.ifmo.ctddev.FSSARecSys.db.internal.FSSAlgorithm item = new ru.ifmo.ctddev.FSSARecSys.db.internal.FSSAlgorithm(name,searchClassName,evaluationClassName,null,evaluationOptions.toString());
                 algorithmNames.add(name);
+                dbAlgorithms.put(name,item);
                 nameToAlgorithm.put(name, fssAlgorithm);
                 return true;
             } catch (Exception e) {

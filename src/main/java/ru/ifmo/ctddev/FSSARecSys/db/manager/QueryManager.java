@@ -20,11 +20,11 @@ public class QueryManager {
 
     private static DBWrapper dbHandler;
 
-    public static final String DB_URL = "jdbc:mysql://localhost/";
+    public static final String DB_URL = "jdbc:mysql://localhost/fss";
 
     //  Database credentials
-    public static final String USER = "root";
-    public static final String PASS = "password";
+    public static final String USER = "newuser";
+    public static final String PASS = "Sudarikov94";
 
     public QueryManager(String DB_URL, String USER, String PASS) {
         this.dbHandler = new DBWrapper(DB_URL, USER, PASS);
@@ -89,7 +89,8 @@ public class QueryManager {
         dbHandler.addFSAlgorithm(fssAlgorithm);
     }
 
-    public ArrayList<FSSAlgorithm> getAvailableFssAlgorithms() throws Exception {return dbHandler.getAvailableFSSAlgorithms();}
+    public ArrayList<FSSAlgorithm> getAvailableFssAlgorithms() throws Exception {return
+            dbHandler.getAvailableFSSAlgorithms();}
 
     //Metric Params
     public void addMetricParam(Metrics metrics, String paramName, MLAlgorithm algo, Double value) throws Exception {
@@ -116,5 +117,10 @@ public class QueryManager {
     public Metrics getMetrics(Metrics metrics) throws Exception {
         return dbHandler.getMetrics(metrics);
     }
+
+    public void ClearSchema() throws Exception {
+        dbHandler.ClearSchema();
+    }
+
 
 }

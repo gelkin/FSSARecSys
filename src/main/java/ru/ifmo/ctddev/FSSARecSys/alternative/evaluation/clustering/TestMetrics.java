@@ -110,100 +110,104 @@ public class TestMetrics {
         ArrayList<Double> tmp = new ArrayList<>();
 
         for (File fi: simples) {
-            Dataset dataset = new Dataset(fi.getName(), fi, "clusterisation");
-            //System.out.println(fi.getName());
 
-            System.out.println("******************************************************");
-            System.out.println(fi.getName());
+            if (fi.exists()) {
 
-            resultMatrix = new ArrayList<ArrayList<Double>>();
+                Dataset dataset = new Dataset(fi.getName(), fi, "clusterisation");
+                System.out.println(fi.getName());
 
-            MLAlgorithm mlkMeans1 = new MLAlgorithm("K-means-1", "weka.clusterers.SimpleKMeans", "-N 5 -A \"weka.core.EuclideanDistance -R first-last\" -I 500 -S 10", "clusterisation");
-            MLAlgorithm mlkMeans2 = new MLAlgorithm("K-means-2", "weka.clusterers.SimpleKMeans", "-N 5 -A \"weka.core.EuclideanDistance -R first-last\" -I 500 -S 100", "clusterisation");
-            MLAlgorithm mlkMeans3 = new MLAlgorithm("K-means-3", "weka.clusterers.SimpleKMeans", "-N 5 -A \"weka.core.EuclideanDistance -R first-last\" -I 500 -S 200", "clusterisation");
-            MLAlgorithm mlDBSCAN = new MLAlgorithm("DBSCAN", "weka.clusterers.DBSCAN", "-E 0.1 -M 6 -I weka.clusterers.forOPTICSAndDBScan.Databases.SequentialDatabase -D weka.clusterers.forOPTICSAndDBScan.DataObjects.EuclideanDataObject", "clusterisation");
-            MLAlgorithm mlEM1 = new MLAlgorithm("EM-1", "weka.clusterers.EM", "-I 100 -N -1 -M 1.0E-6 -S 100", "clusterisation");
-            MLAlgorithm mlEM2 = new MLAlgorithm("EM-2", "weka.clusterers.EM", "-I 100 -N -1 -M 1.0E-6 -S 200", "clusterisation");
-            MLAlgorithm mlEM3 = new MLAlgorithm("EM-3", "weka.clusterers.EM", "-I 100 -N -1 -M 1.0E-6 -S 400", "clusterisation");
-            MLAlgorithm mlFarthestFirst1 = new MLAlgorithm("FarthestFirst-1", "weka.clusterers.FarthestFirst", "-N 5 -S 1", "clusterisation");
-            MLAlgorithm mlFarthestFirst2 = new MLAlgorithm("FarthestFirst-2", "weka.clusterers.FarthestFirst", "-N 5 -S 10", "clusterisation");
-            MLAlgorithm mlFarthestFirst3 = new MLAlgorithm("FarthestFirst-3", "weka.clusterers.FarthestFirst", "-N 5 -S 100", "clusterisation");
-            MLAlgorithm mlHieracical = new MLAlgorithm("Hieracical", "weka.clusterers.HierarchicalClusterer", "-N 5 -L MEAN -P -A \"weka.core.EuclideanDistance -R first-last\"", "clusterisation");
-            MLAlgorithm mlXmeans1 = new MLAlgorithm("X-Means-1", "weka.clusterers.XMeans", "-I 1 -M 1000 -J 1000 -L 2 -H 6 -B 1.0 -C 0.5 -D \"weka.core.EuclideanDistance -R first-last\" -S 10", "clusterisation");
-            MLAlgorithm mlXmeans2 = new MLAlgorithm("X-Means-2", "weka.clusterers.XMeans", "-I 1 -M 1000 -J 1000 -L 2 -H 6 -B 1.0 -C 0.5 -D \"weka.core.EuclideanDistance -R first-last\" -S 100", "clusterisation");
-            MLAlgorithm mlXmeans3 = new MLAlgorithm("X-Means-3", "weka.clusterers.XMeans", "-I 1 -M 1000 -J 1000 -L 2 -H 6 -B 1.0 -C 0.5 -D \"weka.core.EuclideanDistance -R first-last\" -S 200", "clusterisation");
+                System.out.println("******************************************************");
+                System.out.println(fi.getName());
 
-            tmp = evaluateWithMetrics(dataset, mlDBSCAN);
-            algoMap.put(resultMatrix.size(), mlDBSCAN.getName());
-            resultMatrix.add(tmp);
+                MLAlgorithm mlkMeans1 = new MLAlgorithm("K-means-1", "weka.clusterers.SimpleKMeans", "-N 5 -A \"weka.core.EuclideanDistance -R first-last\" -I 500 -S 10", "clusterisation");
+                MLAlgorithm mlkMeans2 = new MLAlgorithm("K-means-2", "weka.clusterers.SimpleKMeans", "-N 5 -A \"weka.core.EuclideanDistance -R first-last\" -I 500 -S 100", "clusterisation");
+                MLAlgorithm mlkMeans3 = new MLAlgorithm("K-means-3", "weka.clusterers.SimpleKMeans", "-N 5 -A \"weka.core.EuclideanDistance -R first-last\" -I 500 -S 200", "clusterisation");
+                MLAlgorithm mlDBSCAN = new MLAlgorithm("DBSCAN", "weka.clusterers.DBSCAN", "-E 0.1 -M 6 -I weka.clusterers.forOPTICSAndDBScan.Databases.SequentialDatabase -D weka.clusterers.forOPTICSAndDBScan.DataObjects.EuclideanDataObject", "clusterisation");
+                MLAlgorithm mlEM1 = new MLAlgorithm("EM-1", "weka.clusterers.EM", "-I 100 -N -1 -M 1.0E-6 -S 100", "clusterisation");
+                MLAlgorithm mlEM2 = new MLAlgorithm("EM-2", "weka.clusterers.EM", "-I 100 -N -1 -M 1.0E-6 -S 200", "clusterisation");
+                MLAlgorithm mlEM3 = new MLAlgorithm("EM-3", "weka.clusterers.EM", "-I 100 -N -1 -M 1.0E-6 -S 400", "clusterisation");
+                MLAlgorithm mlFarthestFirst1 = new MLAlgorithm("FarthestFirst-1", "weka.clusterers.FarthestFirst", "-N 5 -S 1", "clusterisation");
+                MLAlgorithm mlFarthestFirst2 = new MLAlgorithm("FarthestFirst-2", "weka.clusterers.FarthestFirst", "-N 5 -S 10", "clusterisation");
+                MLAlgorithm mlFarthestFirst3 = new MLAlgorithm("FarthestFirst-3", "weka.clusterers.FarthestFirst", "-N 5 -S 100", "clusterisation");
+                MLAlgorithm mlHieracical = new MLAlgorithm("Hieracical", "weka.clusterers.HierarchicalClusterer", "-N 5 -L MEAN -P -A \"weka.core.EuclideanDistance -R first-last\"", "clusterisation");
+                MLAlgorithm mlXmeans1 = new MLAlgorithm("X-Means-1", "weka.clusterers.XMeans", "-I 1 -M 1000 -J 1000 -L 2 -H 6 -B 1.0 -C 0.5 -D \"weka.core.EuclideanDistance -R first-last\" -S 10", "clusterisation");
+                MLAlgorithm mlXmeans2 = new MLAlgorithm("X-Means-2", "weka.clusterers.XMeans", "-I 1 -M 1000 -J 1000 -L 2 -H 6 -B 1.0 -C 0.5 -D \"weka.core.EuclideanDistance -R first-last\" -S 100", "clusterisation");
+                MLAlgorithm mlXmeans3 = new MLAlgorithm("X-Means-3", "weka.clusterers.XMeans", "-I 1 -M 1000 -J 1000 -L 2 -H 6 -B 1.0 -C 0.5 -D \"weka.core.EuclideanDistance -R first-last\" -S 200", "clusterisation");
 
-            tmp = evaluateWithMetrics(dataset, mlEM1);
-            algoMap.put(resultMatrix.size(), mlEM1.getName());
-            resultMatrix.add(tmp);
+                tmp = evaluateWithMetrics(dataset, mlkMeans1);
+                algoMap.put(resultMatrix.size(), mlkMeans1.getName());
+                resultMatrix.add(tmp);
 
-            tmp = evaluateWithMetrics(dataset, mlEM2);
-            algoMap.put(resultMatrix.size(), mlEM2.getName());
-            resultMatrix.add(tmp);
+                tmp = evaluateWithMetrics(dataset, mlkMeans2);
+                algoMap.put(resultMatrix.size(), mlkMeans2.getName());
+                resultMatrix.add(tmp);
 
-            tmp = evaluateWithMetrics(dataset, mlEM3);
-            algoMap.put(resultMatrix.size(), mlEM3.getName());
-            resultMatrix.add(tmp);
+                tmp = evaluateWithMetrics(dataset, mlkMeans3);
+                algoMap.put(resultMatrix.size(), mlkMeans3.getName());
+                resultMatrix.add(tmp);
 
-            tmp = evaluateWithMetrics(dataset, mlFarthestFirst1);
-            algoMap.put(resultMatrix.size(), mlFarthestFirst1.getName());
-            resultMatrix.add(tmp);
+                tmp = evaluateWithMetrics(dataset, mlEM1);
+                algoMap.put(resultMatrix.size(), mlEM1.getName());
+                resultMatrix.add(tmp);
 
-            tmp = evaluateWithMetrics(dataset, mlFarthestFirst2);
-            algoMap.put(resultMatrix.size(), mlFarthestFirst2.getName());
-            resultMatrix.add(tmp);
+                tmp = evaluateWithMetrics(dataset, mlEM2);
+                algoMap.put(resultMatrix.size(), mlEM2.getName());
+                resultMatrix.add(tmp);
 
-            tmp = evaluateWithMetrics(dataset, mlFarthestFirst3);
-            algoMap.put(resultMatrix.size(), mlFarthestFirst3.getName());
-            resultMatrix.add(tmp);
+                tmp = evaluateWithMetrics(dataset, mlEM3);
+                algoMap.put(resultMatrix.size(), mlEM3.getName());
+                resultMatrix.add(tmp);
 
-            tmp = evaluateWithMetrics(dataset, mlHieracical);
-            algoMap.put(resultMatrix.size(), mlHieracical.getName());
-            resultMatrix.add(tmp);
+                tmp = evaluateWithMetrics(dataset, mlDBSCAN);
+                algoMap.put(resultMatrix.size(), mlDBSCAN.getName());
+                resultMatrix.add(tmp);
 
-            tmp = evaluateWithMetrics(dataset, mlkMeans1);
-            algoMap.put(resultMatrix.size(), mlkMeans1.getName());
-            resultMatrix.add(tmp);
+                tmp = evaluateWithMetrics(dataset, mlFarthestFirst1);
+                algoMap.put(resultMatrix.size(), mlFarthestFirst1.getName());
+                resultMatrix.add(tmp);
 
-            tmp = evaluateWithMetrics(dataset, mlkMeans2);
-            algoMap.put(resultMatrix.size(), mlkMeans2.getName());
-            resultMatrix.add(tmp);
+                tmp = evaluateWithMetrics(dataset, mlFarthestFirst2);
+                algoMap.put(resultMatrix.size(), mlFarthestFirst2.getName());
+                resultMatrix.add(tmp);
 
-            tmp = evaluateWithMetrics(dataset, mlkMeans3);
-            algoMap.put(resultMatrix.size(), mlkMeans3.getName());
-            resultMatrix.add(tmp);
+                tmp = evaluateWithMetrics(dataset, mlFarthestFirst3);
+                algoMap.put(resultMatrix.size(), mlFarthestFirst3.getName());
+                resultMatrix.add(tmp);
 
-            tmp = evaluateWithMetrics(dataset, mlXmeans1);
-            algoMap.put(resultMatrix.size(), mlXmeans1.getName());
-            resultMatrix.add(tmp);
+                tmp = evaluateWithMetrics(dataset, mlHieracical);
+                algoMap.put(resultMatrix.size(), mlHieracical.getName());
+                resultMatrix.add(tmp);
 
-            tmp = evaluateWithMetrics(dataset, mlXmeans2);
-            algoMap.put(resultMatrix.size(), mlXmeans2.getName());
-            resultMatrix.add(tmp);
+                tmp = evaluateWithMetrics(dataset, mlXmeans1);
+                algoMap.put(resultMatrix.size(), mlXmeans1.getName());
+                resultMatrix.add(tmp);
 
-            tmp = evaluateWithMetrics(dataset, mlXmeans3);
-            algoMap.put(resultMatrix.size(), mlXmeans3.getName());
-            resultMatrix.add(tmp);
+                tmp = evaluateWithMetrics(dataset, mlXmeans2);
+                algoMap.put(resultMatrix.size(), mlXmeans2.getName());
+                resultMatrix.add(tmp);
+
+                tmp = evaluateWithMetrics(dataset, mlXmeans3);
+                algoMap.put(resultMatrix.size(), mlXmeans3.getName());
+                resultMatrix.add(tmp);
 
 
-            System.out.printf("%-20s", "               ");
-            for (int i = 0; i < metricsMap.size(); i++)
-                System.out.printf("%-20s", metricsMap.get(i));
-            System.out.println();
-            for (int i = 0; i < resultMatrix.size(); i++) {
-                ArrayList<Double> a = resultMatrix.get(i);
-                System.out.printf( "%-20s", algoMap.get(i));
-                for (Double v : a) {
-                    System.out.printf("%-20s", v);
-                }
+                System.out.printf("%-20s", "               ");
+                for (int i = 0; i < metricsMap.size(); i++)
+                    System.out.printf("%-20s", metricsMap.get(i));
                 System.out.println();
+                for (int i = 0; i < resultMatrix.size(); i++) {
+                    ArrayList<Double> a = resultMatrix.get(i);
+                    System.out.printf("%-20s", algoMap.get(i));
+                    for (Double v : a) {
+                        System.out.printf("%-20s", v);
+                    }
+                    System.out.println();
+                }
+            }
+            else {
+                System.out.println("File not exists");
             }
         }
-
 
         ///////////////////ovals//////////////////////////////
 

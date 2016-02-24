@@ -39,6 +39,12 @@ public class Evaluator {
         this.listOfMetaFeatures = listOfFeatures;
     }
 
+    public Evaluator(QueryManager queryManager)
+    {
+        this.queryManager = queryManager;
+
+    }
+
     public void setAlphaAndBeta(float alpha, float betta) {
         this.alpha = alpha;
         this.betta = betta;
@@ -66,6 +72,8 @@ public class Evaluator {
 
                 EARREvaluation  earrEvaluation = new EARREvaluation(alpha, betta, queryManager);
                 return earrEvaluation.evaluate(fssAlgorithm, availableFSSAlgorithms, dataset, listOfMetaFeatures, mlAlgorithm);
+
+
             case "clusterisation":
 //                if (queryManager.getDataset(dataset.getName()) == null) {
 //                    queryManager.addDataset(dataset);
